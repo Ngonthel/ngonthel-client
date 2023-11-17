@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MainStack from "./MainStack";
 import Leaderboard from "../pages/Leaderboard";
 import Profile from '../pages/Profile'
-import { MaterialIcons, Ionicons , MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons , MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function MainTab() {
   const Tab = createBottomTabNavigator();
@@ -24,8 +24,8 @@ export default function MainTab() {
           title: "Home",
           tabBarLabelStyle : {color : '#293038' , fontSize : 18 , paddingVertical : 2},
           tabBarIcon: ({ color , focused }) => (
-            <Ionicons
-              name="home-outline"
+            <FontAwesome
+              name="home"
               size={25}
               color={focused ? "#FFC329" : "gray"}
             />
@@ -55,7 +55,7 @@ export default function MainTab() {
             tabBarLabelStyle : {color : '#293038' , fontSize : 18 , paddingVertical : 2},
             tabBarIcon: ({ color , focused }) => (
               <Ionicons
-                name="person-outline"
+                name="person"
                 size={25}
                 color={focused ? "#FFC329" : "gray"}
               />
