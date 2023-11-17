@@ -6,6 +6,7 @@ import {
   ImageBackground,
   ScrollView,
   FlatList,
+  Platform,
 } from "react-native";
 import Cardlead from "../components/CardLeaderboard";
 
@@ -109,7 +110,7 @@ export default function Leaderboard() {
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === "android" || Platform.OS === 'ios' ? StatusBar.currentHeight : 0,
     paddingHorizontal: 14,
   },
   titleContainer: {

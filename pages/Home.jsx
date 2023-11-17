@@ -5,101 +5,326 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  StatusBar,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 function HomePage() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View className="flex flex-row ml-5 mr-5 mt-5">
-        <View className="flex-1 w-64 items-left justify-center">
-          <Text className="text-lg text-[#696e74]">
+    <View style={styles.AndroidSafeArea}>
+      <View
+        className="flex flex-row"
+        style={{ marginTop: Platform.OS === "ios" ? 20 : 20 }}
+      >
+        <View className="flex-1 items-left justify-center">
+          <Text
+            className="text-lg text-[#696e74]"
+            style={{ fontSize: Platform.OS === "ios" ? 16 : 11 }}
+          >
             Hi, <Text className="font-bold text-[#293038]">[ Username ]</Text>
           </Text>
         </View>
-        <Image
-          className="rounded-md p-4 h-12 w-12 border-4 border-yellow-400"
-          source={require("../assets/profile.jpg")}
-        />
+        <View
+          style={{
+            borderWidth: 4,
+            borderColor: "#FFC329",
+            borderRadius: 6,
+            overflow: "hidden",
+          }}
+        >
+          <Image
+            style={{ width: 48, height: 48 }}
+            source={require("../assets/profile.jpg")}
+          />
+        </View>
       </View>
-      <View className="w-15 h-25 mt-2 ml-5 mr-5">
-        <Text className="text-3xl font-medium text-[#696e74]">
-          Get <Text className="font-extrabold text-[#293038]">Out!</Text>
+      <View
+        style={{
+          width: "85%",
+          height: "10%",
+          marginTop: Platform.OS === "ios" ? 10 : 20,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: Platform.OS === "ios" ? 24 : 15,
+            fontWeight: "bold",
+            color: "#696e74",
+          }}
+        >
+          Get <Text style={{ fontWeight: "bold", color: "#293038" }}>Out!</Text>
         </Text>
-        <Text className="text-3xl font-medium text-[#696e74]">
+        <Text
+          style={{
+            fontSize: Platform.OS === "ios" ? 24 : 15,
+            fontWeight: "bold",
+            color: "#696e74",
+            marginTop: Platform.OS === "ios" ? 5 : 3,
+          }}
+        >
           Wheels Every{" "}
-          <Text className="font-extrabold text-[#293038]">Zone</Text>
+          <Text style={{ fontWeight: "bold", color: "#293038" }}>Zone</Text>
         </Text>
       </View>
-      <View className="w-15 h-25 mt-7 ml-5 mr-5 ">
+
+      <View style={{ width: "100%", height: "100%" }}>
         <Image
-          className=" w-96 h-44"
+          style={{
+            width: "100%",
+            height: "25%",
+            marginTop: Platform.OS === "ios" ? 15 : 10,
+          }}
           source={require("../assets/ngontel2.png")}
         />
         {/* RECENT HISTORY */}
-        <Text className="text-lg mb-3 font-bold text-[#293038]  ">
+        <Text
+          className="font-bold mb-3 text-[#293038]"
+          style={{
+            fontSize: Platform.OS === "ios" ? 24 : 15,
+            marginTop: Platform.OS === "ios" ? 15 : 10,
+          }}
+        >
           Recent History
         </Text>
-        <View className="flex flex-row gap-x-5 items-center justify-center ">
-          <View className="rounded-lg bg-white shadow-sm shadow-slate-300 p-2">
-            <View className="mr-5 ml-5">
-              <Text className="text-lg font-bold text-gray-800">Distance</Text>
-              <Text className="text-sm text-center mt-1">50mil</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 5,
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 3,
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+              borderRadius: 10,
+              ...Platform.select({
+                ios: {
+                  shadowColor: "rgba(0, 0, 0, 0.2)",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 1,
+                },
+                android: {
+                  elevation: 5,
+                },
+              }),
+              padding: Platform.OS === "ios" ? 15 : 7.5,
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 18 : 14,
+                  fontWeight: "bold",
+                  color: "#293038",
+                }}
+              >
+                Distance
+              </Text>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 14 : 10,
+                  textAlign: "center",
+                  marginTop: 1,
+                }}
+              >
+                50mil
+              </Text>
             </View>
           </View>
-          <View className="rounded-lg bg-white shadow-sm shadow-slate-300 p-2">
-            <View className="mr-5 ml-5">
-              <Text className="text-lg font-bold text-gray-800">Speed</Text>
-              <Text className="text-sm text-center mt-1">75km/H</Text>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+              borderRadius: 10,
+              ...Platform.select({
+                ios: {
+                  shadowColor: "rgba(0, 0, 0, 0.2)",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 1,
+                },
+                android: {
+                  elevation: 5,
+                },
+              }),
+              padding: Platform.OS === "ios" ? 15 : 7.5,
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 18 : 14,
+                  fontWeight: "bold",
+                  color: "#293038",
+                }}
+              >
+                Speed
+              </Text>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 14 : 10,
+                  textAlign: "center",
+                  marginTop: 1,
+                }}
+              >
+                75 Km/H
+              </Text>
             </View>
           </View>
-          <View className="rounded-lg bg-white shadow-sm shadow-slate-300 p-2">
-            <View className="mr-5 ml-5">
-              <Text className="text-lg font-bold text-gray-800">Time</Text>
-              <Text className="text-sm text-center mt-1">387wH</Text>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+              borderRadius: 10,
+              ...Platform.select({
+                ios: {
+                  shadowColor: "rgba(0, 0, 0, 0.2)",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 1,
+                },
+                android: {
+                  elevation: 5,
+                },
+              }),
+              padding: Platform.OS === "ios" ? 15 : 7.5,
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 18 : 14,
+                  fontWeight: "bold",
+                  color: "#293038",
+                }}
+              >
+                Time
+              </Text>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 14 : 10,
+                  textAlign: "center",
+                  marginTop: 1,
+                }}
+              >
+                387 wH
+              </Text>
             </View>
           </View>
         </View>
-        <View className="flex flex-row ml-5 mr-3 mt-3">
-          <View className="flex-1 w-64 items-left justify-center"></View>
-          <Text className="text-md font-medium text-[#FFC329]">See all</Text>
+        <View style={{ flexDirection: "row" }}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "flex-end",
+              justifyContent: "center",
+              marginTop: Platform.OS === "ios" ? 5 : 3,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: Platform.OS === "ios" ? 16 : 10,
+                fontWeight: "bold",
+                color: "#FFC329",
+              }}
+            >
+              See all 
+            </Text>
+          </View>
         </View>
         {/* GO CYCLING */}
-        <Text className="text-lg mb-3 font-bold text-[#293038]">
+        <Text
+          className="font-bold mb-3 text-[#293038]"
+          style={{
+            fontSize: Platform.OS === "ios" ? 24 : 15,
+            marginTop: Platform.OS === "ios" ? 15 : 10,
+          }}
+        >
           Go Cycling
         </Text>
-        <View className="rounded-lg h-32 bg-white shadow-sm shadow-slate-300 p-1">
-          <View className="flex flex-row p-1">
+        <View
+          style={{
+            backgroundColor: "white",
+            borderRadius: 10,
+            ...Platform.select({
+              ios: {
+                shadowColor: "rgba(0, 0, 0, 0.2)",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 1,
+              },
+              android: {
+                elevation: 2,
+              },
+            }),
+            padding: Platform.OS === "ios" ? 8 : 7.5,
+          }}
+        >
+          <View style={{ flexDirection: "row" }}>
             <Image
-              className="w-32 h-28"
+              style={{ width: 100, height: 100 }}
               source={require("../assets/map.png")}
             />
-            <View>
-            <Text className="text-sm mt-1 w-52 ml-2 p-1">
-              Find your location, and unclock a world of cycling adventures with
-              Gowez!
-            </Text>
-            <View className="items-center justify-end mt-5"
-          >
-            <TouchableOpacity className="rounded-full w-20 h-6 p-1 bg-[#FFC329] items-center">
-              <Text className="text-md items-center justify-center"> Go </Text>
-            </TouchableOpacity>
-          </View>
+            <View style={{ marginLeft: 10, flex: 1 }}>
+              <Text
+                style={{
+                  fontSize: Platform.OS === "ios" ? 15 : 8,
+                  width: Platform.OS === "ios" ? 200 : 200,
+                  marginTop: Platform.OS === "ios" ? 20 : 10,
+                }}
+              >
+                Find your location, and unlock a world of cycling adventures
+                with Gowez!
+              </Text>
+              <View
+                style={{
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end",
+                  // backgroundColor: "red",
+                  marginBottom: "50",
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    borderRadius: 100,
+                    width: Platform.OS === "ios" ? 50 : 50,
+                    height: Platform.OS === "ios" ?  50 : 50,
+                    backgroundColor: "#FFC329",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: Platform.OS === "ios" ? 16 : 8,
+                      color: "white",
+                    }}
+                  >
+                    Go
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            
           </View>
-          
         </View>
       </View>
-    </SafeAreaView>
+    </View>
+    // </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  AndroidSafeArea: {
     flex: 1,
-    backgroundColor: "#fff",
-    marginRight: 7,
-    marginLeft: 7,
+    paddingTop:
+      Platform.OS === "android" || Platform.OS === "ios"
+        ? StatusBar.currentHeight
+        : 0,
+    paddingHorizontal: 14,
+    backgroundColor: "white",
   },
 });
 
