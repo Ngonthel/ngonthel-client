@@ -1,28 +1,29 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+
 import MainStack from "./MainStack";
 import Leaderboard from "../pages/Leaderboard";
 import Profile from '../pages/Profile'
 import { FontAwesome, Ionicons , MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function MainTab() {
-  const Tab = createBottomTabNavigator();
+//   const Tab = createBottomTabNavigator();
+  const Tab = createMaterialBottomTabNavigator();
+
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarLabelStyle: {
-          fontSize: 18,
-        },
-        tabBarActiveTintColor: "black",
       }}
+      barStyle={{ backgroundColor: 'white' ,height :67  }}
     >
       <Tab.Screen
         name="home"
         component={MainStack}
         options={{
           title: "Home",
-          tabBarLabelStyle : {color : '#293038' , fontSize : 18 , paddingVertical : 2},
+          tabBarLabelStyle : {color : '#293038' , fontSize : 16 },
           tabBarIcon: ({ color , focused }) => (
             <FontAwesome
               name="home"
@@ -37,7 +38,7 @@ export default function MainTab() {
         component={Leaderboard}
         options={{
             title: "Leaderboard",
-            tabBarLabelStyle : {color : '#293038' , fontSize : 18 , paddingVertical : 2},
+            tabBarLabelStyle : {color : '#293038' , fontSize : 16 },
             tabBarIcon: ({ color , focused }) => (
               <MaterialCommunityIcons
                 name="podium"
@@ -52,11 +53,11 @@ export default function MainTab() {
         component={Profile}
         options={{
             title: "Profile",
-            tabBarLabelStyle : {color : '#293038' , fontSize : 18 , paddingVertical : 2},
+            tabBarLabelStyle : {color : '#293038' , fontSize : 16 },
             tabBarIcon: ({ color , focused }) => (
               <Ionicons
                 name="person"
-                size={25}
+                size={22}
                 color={focused ? "#FFC329" : "gray"}
               />
             ),

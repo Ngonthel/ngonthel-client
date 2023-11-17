@@ -1,7 +1,15 @@
-import { View, Text, StyleSheet , Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Image } from "react-native";
+import { FontAwesome5 } from '@expo/vector-icons';
 
-export default function Cardleaderboard() {
+export default function Cardleaderboard({ title, index }) {
+  let medalColor = "transparent"; 
+  if (index === 0) {
+    medalColor = "#FFD700"
+  } else if (index === 1) {
+    medalColor = "#C0C0C0"
+  } else if (index === 2) {
+    medalColor = "#964B00"
+  }
   return (
     <View style={styles.card}>
       <Text
@@ -9,17 +17,19 @@ export default function Cardleaderboard() {
           alignSelf: "center",
           fontSize: 20,
           fontWeight: "500",
-          marginRight: 20,
         }}
       >
-        1
+        {index + 1}
       </Text>
       <View style={styles.avatarContainer}>
-        <Image source={require('../assets/avatar.gif')} style={styles.avatar}/>
+        <Image source={require("../assets/default-person.jpg")} style={styles.avatar} />
       </View>
-      <View style={{alignSelf : 'center'}}>
+      <View style={{ alignSelf: "center" }}>
         <Text style={{ fontSize: 20, fontWeight: "600" }}>Agus Bensin</Text>
         <Text>1000 points</Text>
+      </View>
+      <View style={{ alignSelf: "center" }}>
+      <FontAwesome5 name="medal" size={24} color={medalColor} />
       </View>
     </View>
   );
@@ -31,15 +41,16 @@ const styles = StyleSheet.create({
     padding: 7,
     borderRadius: 5,
     flexDirection: "row",
-    marginVertical : 3
+    marginVertical: 3,
+    justifyContent : "space-around"
   },
   avatarContainer: {
     width: 50,
     height: 50,
-    borderRadius: 50, 
-    overflow: 'hidden',
-    alignSelf : "center",
-    marginRight: 20
+    borderRadius: 50,
+    overflow: "hidden",
+    alignSelf: "center",
+    marginRight: 20,
   },
   avatar: {
     width: 50,
