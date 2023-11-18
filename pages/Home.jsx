@@ -19,18 +19,13 @@ function HomePage() {
         <View className="flex-1 items-left justify-center">
           <Text
             className="text-lg text-[#696e74]"
-            style={{ fontSize: Platform.OS === "ios" ? 16 : 11 }}
+            style={{ fontSize: 16 }}
           >
             Hi, <Text className="font-bold text-[#293038]">[ Username ]</Text>
           </Text>
         </View>
         <View
-          style={{
-            borderWidth: 4,
-            borderColor: "#FFC329",
-            borderRadius: 6,
-            overflow: "hidden",
-          }}
+          style={styles.ProfilePicture}
         >
           <Image
             style={{ width: 48, height: 48 }}
@@ -40,27 +35,18 @@ function HomePage() {
       </View>
       <View
         style={{
-          width: "85%",
-          height: "10%",
+          // width: "85%",
+          // height: "10%",
           marginTop: Platform.OS === "ios" ? 10 : 20,
         }}
       >
         <Text
-          style={{
-            fontSize: Platform.OS === "ios" ? 24 : 15,
-            fontWeight: "bold",
-            color: "#696e74",
-          }}
+          style={styles.TitleHeader}
         >
           Get <Text style={{ fontWeight: "bold", color: "#293038" }}>Out!</Text>
         </Text>
         <Text
-          style={{
-            fontSize: Platform.OS === "ios" ? 24 : 15,
-            fontWeight: "bold",
-            color: "#696e74",
-            marginTop: Platform.OS === "ios" ? 5 : 3,
-          }}
+          style={styles.TitleHeader}
         >
           Wheels Every{" "}
           <Text style={{ fontWeight: "bold", color: "#293038" }}>Zone</Text>
@@ -69,147 +55,65 @@ function HomePage() {
 
       <View style={{ width: "100%", height: "100%" }}>
         <Image
-          style={{
-            width: "100%",
-            height: "25%",
-            marginTop: Platform.OS === "ios" ? 15 : 10,
-          }}
+          style={styles.Banner}
           source={require("../assets/ngontel2.png")}
         />
         {/* RECENT HISTORY */}
         <Text
           className="font-bold mb-3 text-[#293038]"
           style={{
-            fontSize: Platform.OS === "ios" ? 24 : 15,
+            fontSize: 24,
             marginTop: Platform.OS === "ios" ? 15 : 10,
           }}
         >
           Recent History
         </Text>
         <View
-          style={{
-            flexDirection: "row",
-            gap: 5,
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 3,
-          }}
+          style={styles.RowRecentHistory}
         >
           <View
-            style={{
-              flex: 1,
-              backgroundColor: "white",
-              borderRadius: 10,
-              ...Platform.select({
-                ios: {
-                  shadowColor: "rgba(0, 0, 0, 0.2)",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 1,
-                },
-                android: {
-                  elevation: 5,
-                },
-              }),
-              padding: Platform.OS === "ios" ? 15 : 7.5,
-              alignItems: "center",
-            }}
+            style={styles.CardShadow}
           >
             <View>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 18 : 14,
-                  fontWeight: "bold",
-                  color: "#293038",
-                }}
+                style={styles.TitleHistory}
               >
                 Distance
               </Text>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 14 : 10,
-                  textAlign: "center",
-                  marginTop: 1,
-                }}
+                style={styles.DataHistory}
               >
                 50mil
               </Text>
             </View>
           </View>
           <View
-            style={{
-              flex: 1,
-              backgroundColor: "white",
-              borderRadius: 10,
-              ...Platform.select({
-                ios: {
-                  shadowColor: "rgba(0, 0, 0, 0.2)",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 1,
-                },
-                android: {
-                  elevation: 5,
-                },
-              }),
-              padding: Platform.OS === "ios" ? 15 : 7.5,
-              alignItems: "center",
-            }}
+            style={styles.CardShadow}
           >
             <View>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 18 : 14,
-                  fontWeight: "bold",
-                  color: "#293038",
-                }}
+                style={styles.TitleHistory}
               >
                 Speed
               </Text>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 14 : 10,
-                  textAlign: "center",
-                  marginTop: 1,
-                }}
+                style={styles.DataHistory}
               >
                 75 Km/H
               </Text>
             </View>
           </View>
           <View
-            style={{
-              flex: 1,
-              backgroundColor: "white",
-              borderRadius: 10,
-              ...Platform.select({
-                ios: {
-                  shadowColor: "rgba(0, 0, 0, 0.2)",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 1,
-                },
-                android: {
-                  elevation: 5,
-                },
-              }),
-              padding: Platform.OS === "ios" ? 15 : 7.5,
-              alignItems: "center",
-            }}
+            style={styles.CardShadow}
           >
             <View>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 18 : 14,
-                  fontWeight: "bold",
-                  color: "#293038",
-                }}
+                style={styles.TitleHistory}
               >
                 Time
               </Text>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 14 : 10,
-                  textAlign: "center",
-                  marginTop: 1,
-                }}
+                style={styles.DataHistory}
               >
                 387 wH
               </Text>
@@ -240,7 +144,7 @@ function HomePage() {
         <Text
           className="font-bold mb-3 text-[#293038]"
           style={{
-            fontSize: Platform.OS === "ios" ? 24 : 15,
+            fontSize: 24,
             marginTop: Platform.OS === "ios" ? 15 : 10,
           }}
         >
@@ -270,11 +174,7 @@ function HomePage() {
             />
             <View style={{ marginLeft: 10, flex: 1 }}>
               <Text
-                style={{
-                  fontSize: Platform.OS === "ios" ? 15 : 8,
-                  width: Platform.OS === "ios" ? 200 : 200,
-                  marginTop: Platform.OS === "ios" ? 20 : 10,
-                }}
+                style={styles.CaptionGoCycling}
               >
                 Find your location, and unlock a world of cycling adventures
                 with Gowez!
@@ -283,23 +183,15 @@ function HomePage() {
                 style={{
                   alignItems: "flex-end",
                   justifyContent: "flex-end",
-                  // backgroundColor: "red",
                   marginBottom: "50",
                 }}
               >
                 <TouchableOpacity
-                  style={{
-                    borderRadius: 100,
-                    width: Platform.OS === "ios" ? 50 : 50,
-                    height: Platform.OS === "ios" ?  50 : 50,
-                    backgroundColor: "#FFC329",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  style={styles.TouchableOpacity}
                 >
                   <Text
                     style={{
-                      fontSize: Platform.OS === "ios" ? 16 : 8,
+                      fontSize: 16,
                       color: "white",
                     }}
                   >
@@ -326,6 +218,70 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: "white",
   },
+  TitleHeader: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#696e74",
+    // marginTop: Platform.OS === "ios" ? 5 : 3
+  },
+  ProfilePicture: {
+    borderWidth: 4,
+    borderColor: "#FFC329",
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  Banner: {
+    width: "100%",
+    height: "25%",
+    marginTop: Platform.OS === "ios" ? 15 : 10,
+  },
+  RowRecentHistory: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+  },
+  CardShadow: {
+    flex: 1,
+    backgroundColor: "white",
+    borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+    padding: Platform.OS === "ios" ? 15 : 7.5,
+    alignItems: "center",
+  },
+  TitleHistory: {
+    fontSize: Platform.OS === "ios" ? 18 : 14,
+    fontWeight: "bold",
+    color: "#293038",
+  },
+  DataHistory: {
+    fontSize: Platform.OS === "ios" ? 14 : 10,
+    textAlign: "center",
+    marginTop: 1,
+  },
+  CaptionGoCycling: {
+    fontSize: 13,
+    width: 200,
+    marginTop: Platform.OS === "ios" ? 20 : 10,
+  },
+  TouchableOpacity: {
+    borderRadius: 100,
+    width: 50,
+    height: 50,
+    backgroundColor: "#FFC329",
+    alignItems: "center",
+    justifyContent: "center",
+  }
 });
 
 export default HomePage;
