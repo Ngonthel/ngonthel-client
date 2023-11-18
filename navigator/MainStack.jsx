@@ -6,10 +6,10 @@ import History from "../pages/History";
 export default function MainStack(){
     const Stack = createNativeStackNavigator()
     return(
-        <Stack.Navigator screenOptions={{headerShown : false }}>
-            <Stack.Screen  name="home" component={Home}  />
-            <Stack.Screen name="login" component={Login} />
-            <Stack.Screen name="history" component={History} />
+        <Stack.Navigator >
+            <Stack.Screen  name="home" component={Home} options={{ headerShown: false }} />
+            <Stack.Screen name="login" component={Login} options={{ headerShown: false }} />
+            <Stack.Screen name="History" component={History} />
         </Stack.Navigator>
     )
     

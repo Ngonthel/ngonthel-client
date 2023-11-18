@@ -6,7 +6,7 @@ import {
   StyleSheet,
   StatusBar,
   Dimensions,
-  FlatList
+  FlatList,
 } from "react-native";
 import {
   LineChart,
@@ -18,52 +18,53 @@ import {
 } from "react-native-chart-kit";
 import CardHistory from "../components/CardHistory";
 export default function History() {
-    const DATA = [
-        {
-          "startTime": "2023-11-18T08:00:00",
-          "endTime": "2023-11-18T09:30:00",
-          "avgSpeed": 15.5,
-          "point": "A to B",
-          "distance": 20.3
-        },
-        {
-          "startTime": "2023-11-19T14:30:00",
-          "endTime": "2023-11-19T16:00:00",
-          "avgSpeed": 12.2,
-          "point": "C to D",
-          "distance": 15.8
-        },
-        {
-          "startTime": "2023-11-20T09:45:00",
-          "endTime": "2023-11-20T11:15:00",
-          "avgSpeed": 18.0,
-          "point": "E to F",
-          "distance": 25.1
-        },
-        {
-          "startTime": "2023-11-21T07:15:00",
-          "endTime": "2023-11-21T08:00:00",
-          "avgSpeed": 10.5,
-          "point": "G to H",
-          "distance": 12.7
-        },
-        {
-          "startTime": "2023-11-22T17:30:00",
-          "endTime": "2023-11-22T19:00:00",
-          "avgSpeed": 14.8,
-          "point": "I to J",
-          "distance": 18.4
-        }
-      ]
-      const Item = ({title}) => (
-        <View style={styles.item}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
-      );
-      
+  const DATA = [
+    {
+      startTime: "2023-11-18T08:00:00",
+      endTime: "2023-11-18T09:30:00",
+      avgSpeed: 15.5,
+      point: "A to B",
+      distance: 20.3,
+    },
+    {
+      startTime: "2023-11-19T14:30:00",
+      endTime: "2023-11-19T16:00:00",
+      avgSpeed: 12.2,
+      point: "C to D",
+      distance: 15.8,
+    },
+    {
+      startTime: "2023-11-20T09:45:00",
+      endTime: "2023-11-20T11:15:00",
+      avgSpeed: 18.0,
+      point: "E to F",
+      distance: 25.1,
+    },
+    {
+      startTime: "2023-11-21T07:15:00",
+      endTime: "2023-11-21T08:00:00",
+      avgSpeed: 10.5,
+      point: "G to H",
+      distance: 12.7,
+    },
+    {
+      startTime: "2023-11-22T17:30:00",
+      endTime: "2023-11-22T19:00:00",
+      avgSpeed: 14.8,
+      point: "I to J",
+      distance: 18.4,
+    },
+  ];
+  const Item = ({ title }) => (
+    <View style={styles.item}>
+      <Text style={styles.title}>{title}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.AndroidSafeArea}>
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
+      {/* History Lates */}
+      {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
         <Text
           className="font-bold text-[#293038]"
           style={{
@@ -73,18 +74,8 @@ export default function History() {
         >
           History Latest
         </Text>
-      </View>
-
-      <View
-        style={{
-          marginTop: 20,
-          flexDirection: "row",
-          gap: 5,
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 1,
-        }}
-      >
+      </View> */}
+      <View style={styles.ContainerHistoryLatest}>
         <View style={styles.CardShadow}>
           <View>
             <Text style={styles.TitleHistory}>Distance</Text>
@@ -104,26 +95,10 @@ export default function History() {
           </View>
         </View>
       </View>
+
+      {/* CHART */}
       <View
-        style={{
-          marginTop: Platform.OS === "ios" ? 20 : 20,
-          justifyContent: "center",
-          backgroundColor: "white",
-          borderRadius: 10,
-          width: "100%",
-          // height: "50%",
-          ...Platform.select({
-            ios: {
-              shadowColor: "rgba(0, 0, 0, 0.2)",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 1,
-            },
-            android: {
-              elevation: 2,
-            },
-          }),
-          padding: Platform.OS === "ios" ? 8 : 7.5,
-        }}
+        style={styles.ChartShadow}
       >
         <LineChart
           data={{
@@ -172,22 +147,22 @@ export default function History() {
         />
       </View>
 
+      {/* My History */}
       <Text
-          className="font-bold text-[#293038]"
-          style={{
-            fontSize: 24,
-            marginTop: Platform.OS === "ios" ? 15 : 10,
-          }}
-        >
-          My History
-        </Text>
-      <FlatList 
+        className="font-bold text-[#293038]"
+        style={{
+          fontSize: 24,
+          marginTop: Platform.OS === "ios" ? 15 : 10,
+        }}
+      >
+        My History
+      </Text>
+      <FlatList
         data={DATA}
         showsVerticalScrollIndicator={false}
-        renderItem={({item}) => <CardHistory item={item} />}
-        keyExtractor={item => item.id}
+        renderItem={({ item }) => <CardHistory item={item} />}
+        keyExtractor={(item) => item.id}
       />
-
     </View>
     // </View>
   );
@@ -230,4 +205,31 @@ const styles = StyleSheet.create({
     padding: Platform.OS === "ios" ? 15 : 7.5,
     alignItems: "center",
   },
+  ContainerHistoryLatest: {
+    marginTop: 3,
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 1,
+  },
+  ChartShadow: {
+    marginTop: 20,
+    justifyContent: "center",
+    backgroundColor: "white",
+    borderRadius: 10,
+    width: "100%",
+    // height: "50%",
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+    padding: Platform.OS === "ios" ? 8 : 7.5,
+  }
 });

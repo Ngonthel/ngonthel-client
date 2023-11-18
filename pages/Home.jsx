@@ -9,45 +9,49 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-function HomePage({ navigation}) {
+import { FontAwesome5 } from "@expo/vector-icons";
+function HomePage({ navigation }) {
   return (
     <View style={styles.AndroidSafeArea}>
-      <View
-        className="flex flex-row"
-        style={{ marginTop: 20}}
-      >
+      {/* HI, USERNAME */}
+      <View className="flex flex-row" style={{ marginTop: 20 }}>
         <View className="flex-1 items-left justify-center">
-          <Text
-            className="text-lg text-[#696e74]"
-            style={{ fontSize: 16 }}
-          >
+          <Text style={styles.TextHi}>
             Hi, <Text className="font-bold text-[#293038]">[ Username ]</Text>
           </Text>
+          <View style={{ flexDirection: "row" }}>
+            <View
+              style={{
+                alignItems: "left",
+                justifyContent: "center",
+                marginRight: 4,
+              }}
+            >
+              <FontAwesome5 name="coins" size={11} color="#ffc329" />
+            </View>
+            <Text className="text-lg text-[#696e74]" style={styles.DataHistory}>
+              12
+            </Text>
+          </View>
         </View>
-        <View
-          style={styles.ProfilePicture}
-        >
+        <View style={styles.ProfilePicture}>
           <Image
             style={{ width: 48, height: 48 }}
             source={require("../assets/profile.jpg")}
           />
         </View>
       </View>
+
+      {/* GET OUT WHEELS EVERY ZONE */}
       <View
         style={{
-          // width: "85%",
-          // height: "10%",
           marginTop: Platform.OS === "ios" ? 10 : 20,
         }}
       >
-        <Text
-          style={styles.TitleHeader}
-        >
+        <Text style={styles.TitleHeader}>
           Get <Text style={{ fontWeight: "bold", color: "#293038" }}>Out!</Text>
         </Text>
-        <Text
-          style={styles.TitleHeader}
-        >
+        <Text style={styles.TitleHeader}>
           Wheels Every{" "}
           <Text style={{ fontWeight: "bold", color: "#293038" }}>Zone</Text>
         </Text>
@@ -58,146 +62,55 @@ function HomePage({ navigation}) {
           style={styles.Banner}
           source={require("../assets/ngontel2.png")}
         />
+
         {/* RECENT HISTORY */}
-        <Text
-          className="font-bold mb-3 text-[#293038]"
-          style={{
-            fontSize: 24,
-            marginTop: Platform.OS === "ios" ? 15 : 10,
-          }}
-        >
-          Recent History
-        </Text>
-        <View
-          style={styles.RowRecentHistory}
-        >
-          <View
-            style={styles.CardShadow}
-          >
+        <Text style={styles.Title}>Recent History</Text>
+        <View style={styles.RowRecentHistory}>
+          <View style={styles.CardShadow}>
             <View>
-              <Text
-                style={styles.TitleHistory}
-              >
-                Distance
-              </Text>
-              <Text
-                style={styles.DataHistory}
-              >
-                50mil
-              </Text>
+              <Text style={styles.TitleHistory}>Distance</Text>
+              <Text style={styles.DataHistory}>50mil</Text>
             </View>
           </View>
-          <View
-            style={styles.CardShadow}
-          >
+          <View style={styles.CardShadow}>
             <View>
-              <Text
-                style={styles.TitleHistory}
-              >
-                Speed
-              </Text>
-              <Text
-                style={styles.DataHistory}
-              >
-                75 Km/H
-              </Text>
+              <Text style={styles.TitleHistory}>Speed</Text>
+              <Text style={styles.DataHistory}>75 Km/H</Text>
             </View>
           </View>
-          <View
-            style={styles.CardShadow}
-          >
+          <View style={styles.CardShadow}>
             <View>
-              <Text
-                style={styles.TitleHistory}
-              >
-                Time
-              </Text>
-              <Text
-                style={styles.DataHistory}
-              >
-                387 wH
-              </Text>
+              <Text style={styles.TitleHistory}>Time</Text>
+              <Text style={styles.DataHistory}>387 wH</Text>
             </View>
           </View>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "flex-end",
-              justifyContent: "center",
-              marginTop: Platform.OS === "ios" ? 5 : 3,
-            }}
-          >
+          <View style={styles.SeeAll}>
             <Text
-              style={{
-                fontSize: Platform.OS === "ios" ? 16 : 10,
-                fontWeight: "bold",
-                color: "#FFC329",
-              }}
-              onPress={() => navigation.navigate("history")}
+              style={styles.TextSeeAll}
+              onPress={() => navigation.navigate("History")}
             >
-              See all 
+              See all
             </Text>
           </View>
         </View>
         {/* GO CYCLING */}
-        <Text
-          className="font-bold mb-3 text-[#293038]"
-          style={{
-            fontSize: 24,
-            marginTop: Platform.OS === "ios" ? 15 : 10,
-          }}
-        >
-          Go Cycling
-        </Text>
-        <View
-          style={{
-            backgroundColor: "white",
-            borderRadius: 10,
-            ...Platform.select({
-              ios: {
-                shadowColor: "rgba(0, 0, 0, 0.2)",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 1,
-              },
-              android: {
-                elevation: 2,
-              },
-            }),
-            padding: Platform.OS === "ios" ? 8 : 7.5,
-          }}
-        >
+        <Text style={styles.Title}>Go Cycling</Text>
+        <View style={styles.ShadowGoCycling}>
           <View style={{ flexDirection: "row" }}>
             <Image
               style={{ width: 100, height: 100 }}
               source={require("../assets/map.png")}
             />
             <View style={{ marginLeft: 10, flex: 1 }}>
-              <Text
-                style={styles.CaptionGoCycling}
-              >
+              <Text style={styles.CaptionGoCycling}>
                 Find your location, and unlock a world of cycling adventures
                 with Gowez!
               </Text>
-              <View
-                style={{
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end",
-                  marginBottom: "50",
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.TouchableOpacity}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      color: "white",
-                    }}
-                  >
-                    Go
-                  </Text>
+              <View style={styles.ButtonContainer}>
+                <TouchableOpacity style={styles.TouchableOpacity}>
+                  <Text style={styles.TextButton}>Go</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -260,6 +173,21 @@ const styles = StyleSheet.create({
     padding: Platform.OS === "ios" ? 15 : 7.5,
     alignItems: "center",
   },
+  ShadowGoCycling: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+    padding: Platform.OS === "ios" ? 8 : 7.5,
+  },
   TitleHistory: {
     fontSize: Platform.OS === "ios" ? 18 : 14,
     fontWeight: "bold",
@@ -269,9 +197,11 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === "ios" ? 14 : 10,
     textAlign: "center",
     marginTop: 1,
+    color: "#696e74",
   },
   CaptionGoCycling: {
     fontSize: 13,
+    color: "#696e74",
     width: 200,
     marginTop: Platform.OS === "ios" ? 20 : 10,
   },
@@ -282,7 +212,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC329",
     alignItems: "center",
     justifyContent: "center",
-  }
+  },
+  TextHi: {
+    fontSize: Platform.OS === "ios" ? 14 : 10,
+    marginTop: 1,
+    color: "#696e74",
+  },
+  SeeAll: {
+    flex: 1,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    marginTop: Platform.OS === "ios" ? 5 : 3,
+  },
+  TextSeeAll: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFC329",
+  },
+  Title: {
+    fontSize: 24,
+    marginTop: Platform.OS === "ios" ? 15 : 10,
+    fontWeight: "bold",
+    marginBottom: 3,
+    color: "#293038",
+  },
+  ButtonContainer: {
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    marginBottom: "50",
+  },
+  TextButton: {
+    fontSize: 16,
+    color: "white",
+  },
 });
 
 export default HomePage;
