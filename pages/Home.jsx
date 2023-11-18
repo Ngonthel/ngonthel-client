@@ -9,12 +9,12 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-function HomePage() {
+function HomePage({ navigation}) {
   return (
     <View style={styles.AndroidSafeArea}>
       <View
         className="flex flex-row"
-        style={{ marginTop: Platform.OS === "ios" ? 20 : 20 }}
+        style={{ marginTop: 20}}
       >
         <View className="flex-1 items-left justify-center">
           <Text
@@ -135,6 +135,7 @@ function HomePage() {
                 fontWeight: "bold",
                 color: "#FFC329",
               }}
+              onPress={() => navigation.navigate("history")}
             >
               See all 
             </Text>
