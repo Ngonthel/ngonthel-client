@@ -11,6 +11,7 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useState, useEffect } from "react";
 import haversine from "haversine";
 import * as Location from "expo-location";
+import { Platform } from 'react-native';
 
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
@@ -83,9 +84,10 @@ export default function CyclingPage() {
 
     if (run) {
       setPrevLocation([...prevLocation, initialRegion]);
-      const distance = haversine(locFirst, initialRegion);
+      const distance = haversine(locFirst, initialRegion, {unit: 'meter'});
       const distancePls = distanceTravel + distance;
-      setDistanceTravel(distancePls);
+      const distanceResult = Math.round(distancePls * 100) / 100
+      setDistanceTravel(distanceResult);
       setLocFirst(initialRegion);
     } else {
       console.log("ga maiin");
@@ -140,11 +142,13 @@ export default function CyclingPage() {
     if (value) {
       setRegionLocation();
     }
-    setfollow(value);
+    setfollow(false);
   }
 
+
   return (
-    <View style={styles.AndroidSafeArea}>
+    <View
+     style={styles.AndroidSafeArea}>
       {/* <View style={styles.CardShadow}> */}
       <View style={{ alignItems: "center", justifyContent: "center" }}>
         <Text
@@ -163,21 +167,15 @@ export default function CyclingPage() {
         <View style={styles.DataShadow}>
           <View>
             <Text style={styles.TitleHistory}>Distance</Text>
-            <Text style={styles.DataHistory}>{distanceTravel}</Text>
+            <Text style={styles.DataHistory}>{distanceTravel} m</Text>
           </View>
         </View>
         <View style={styles.DataShadow}>
           <View>
             <Text style={styles.TitleHistory}>Speed</Text>
             <Text style={styles.DataHistory}>
-              {currentLocation?.speed} Km/H
+              {Math.round(currentLocation?.speed * 100) / 100} m/s
             </Text>
-          </View>
-        </View>
-        <View style={styles.DataShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Time</Text>
-            <Text style={styles.DataHistory}>387 wH</Text>
           </View>
         </View>
       </View>
@@ -188,7 +186,7 @@ export default function CyclingPage() {
           provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
           region={follow ? initialRegion : regionLocation}
-          onRegionChangeComplete={(e) => followHadler(e)}
+          onTouchEnd={(e) => followHadler(e)}
         >
           {currentLocation && (
             <>
@@ -199,23 +197,24 @@ export default function CyclingPage() {
                 }}
                 title="Your Location"
               />
-              <Polyline coordinates={prevLocation} strokeWidth={3} />
+              <Polyline coordinates={prevLocation} strokeWidth={3} strokeColor="#FFC329" />
             </>
           )}
         </MapView>
       )}
-      <TouchableOpacity
+    
+    <TouchableOpacity
         style={{
-          position: "absolute",
-          top: 500,
-          left: 10,
-          width: 2,
-          height: 2,
+            position: "absolute",
+            top: Platform.OS === 'ios' ? 400 : 500,
+            left: 10,
+            width: 2,
+            height: 2,
         }}
         onPress={() => setfollow(true)}
-      >
+    >
         <Image source={require("../assets/greenIndicator.png")} />
-      </TouchableOpacity>
+    </TouchableOpacity>
 
       <View style={styles.ButtonContainer}>
         <TouchableOpacity
@@ -228,21 +227,25 @@ export default function CyclingPage() {
     </View>
   );
 }
-
+const { width, height } = Dimensions.get('window');
+const isAndroid = Platform.OS === 'android';
 const styles = StyleSheet.create({
+    
   AndroidSafeArea: {
     // flex: 1,
-    paddingTop:
-      Platform.OS === "android" || Platform.OS === "ios"
-        ? StatusBar.currentHeight
-        : 0,
+    // paddingTop:
+    //   Platform.OS === "android" || Platform.OS === "ios"
+    //     ? StatusBar.currentHeight
+    //     : 0,
     paddingHorizontal: 14,
     backgroundColor: "white",
+    // width: isAndroid ? width : width * 1,
+    height: isAndroid ? height : height * 0.83,
   },
   map: {
     // flex: 1,
     width: "100%",
-    height: "60%",
+    height: "55%",
   },
   CardShadow: {
     // flex: 1,
@@ -262,9 +265,10 @@ const styles = StyleSheet.create({
     padding: Platform.OS === "ios" ? 8 : 7.5,
   },
   ButtonContainer: {
+    // position: 'absolute',
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30,
+    marginTop: 10,
     // backgroundColor: 'red'
   },
   TouchableOpacity: {
