@@ -187,8 +187,8 @@ export default function CyclingPage() {
           style={styles.map}
           provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
-          region={follow ? initialRegion : false}
-          onRegionChangeComplete={(e) => setfollow(false)}
+          region={follow ? initialRegion : regionLocation}
+          onRegionChangeComplete={(e) => followHadler(e)}
         >
           {currentLocation && (
             <>
@@ -204,18 +204,18 @@ export default function CyclingPage() {
           )}
         </MapView>
       )}
-          <TouchableOpacity
-            style={{
-              //   position: 'absolute',
-              //   bottom: 10,
-              //   right: -50,
-              width: 2,
-              height: 2,
-            }}
-            onPress={() => setfollow(true)}
-          >
-            <Image source={require("../assets/greenIndicator.png")} />
-          </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: 500,
+          left: 10,
+          width: 2,
+          height: 2,
+        }}
+        onPress={() => setfollow(true)}
+      >
+        <Image source={require("../assets/greenIndicator.png")} />
+      </TouchableOpacity>
 
       <View style={styles.ButtonContainer}>
         <TouchableOpacity
