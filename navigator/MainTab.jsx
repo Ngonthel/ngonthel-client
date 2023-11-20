@@ -8,13 +8,13 @@ import {
   FontAwesome,
   Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
+import Event from "../pages/Event";
 
 export default function MainTab() {
   //   const Tab = createBottomTabNavigator();
   const Tab = createMaterialBottomTabNavigator();
-
- 
 
   return (
     <Tab.Navigator
@@ -54,6 +54,21 @@ export default function MainTab() {
         }}
       />
       <Tab.Screen
+        name="event"
+        component={Event}
+        options={{
+          title: "Event",
+          tabBarLabelStyle: { color: "#293038", fontSize: 16 },
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialIcons
+              name="event-note"
+              size={27}
+              color={focused ? "#FFC329" : "gray"}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="profile"
         component={Profile}
         options={{
@@ -69,6 +84,5 @@ export default function MainTab() {
         }}
       />
     </Tab.Navigator>
-    
   );
 }
