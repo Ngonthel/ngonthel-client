@@ -22,12 +22,15 @@ export default function MainTab() {
         headerShown: false,
       }}
       barStyle={{ backgroundColor: "white", height: 67 }}
+      barStyle={{ backgroundColor: "white", height: 67 }}
     >
       <Tab.Screen
-        name="home"
+        name="homeTab"
         component={MainStack}
         options={{
           title: "Home",
+          tabBarLabelStyle: { color: "#293038", fontSize: 16 },
+          tabBarIcon: ({ color, focused }) => (
           tabBarLabelStyle: { color: "#293038", fontSize: 16 },
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome
@@ -42,6 +45,16 @@ export default function MainTab() {
         name="leaderboard"
         component={Leaderboard}
         options={{
+          title: "Leaderboard",
+          tabBarLabelStyle: { color: "#293038", fontSize: 16 },
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name="podium"
+              size={25}
+              color={focused ? "#FFC329" : "gray"}
+            />
+          ),
+        }}
           title: "Leaderboard",
           tabBarLabelStyle: { color: "#293038", fontSize: 16 },
           tabBarIcon: ({ color, focused }) => (
@@ -72,6 +85,16 @@ export default function MainTab() {
         name="profile"
         component={Profile}
         options={{
+          title: "Profile",
+          tabBarLabelStyle: { color: "#293038", fontSize: 16 },
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name="person"
+              size={22}
+              color={focused ? "#FFC329" : "gray"}
+            />
+          ),
+        }}
           title: "Profile",
           tabBarLabelStyle: { color: "#293038", fontSize: 16 },
           tabBarIcon: ({ color, focused }) => (

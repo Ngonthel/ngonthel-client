@@ -3,14 +3,18 @@ import {
   Text,
   StyleSheet,
   StatusBar,
-  ImageBackground,
+  TouchableOpacity,
   ScrollView,
   Image,
 } from "react-native";
+import useMyStore from "../store/MainStore";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage"
 export default function Profile() {
+   const logout = useMyStore((state) => state.logout)
   return (
-    <ScrollView>
-      <View style={styles.AndroidSafeArea}>
+    <ScrollView style={styles.AndroidSafeArea}>
+      <View >
         <View style={styles.avatarContainer}>
           <Image
             source={require("../assets/avatar.gif")}
@@ -75,8 +79,12 @@ export default function Profile() {
           </View>
         </View>
       </View>
+      <View style={{marginTop : 20}}>
+        <TouchableOpacity onPress={logout} style={{borderColor: 'red' , borderWidth : 1 , alignSelf : "flex-start" , padding : 10 , borderRadius : 10}}>
+          <Text>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
-    // </ImageBackground>
   );
 }
 
