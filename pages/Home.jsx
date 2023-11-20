@@ -109,7 +109,7 @@ function HomePage({ navigation }) {
                 with Gowez!
               </Text>
               <View style={styles.ButtonContainer}>
-                <TouchableOpacity style={styles.TouchableOpacity}>
+                <TouchableOpacity style={styles.TouchableOpacity}  onPress={() => navigation.navigate("Cycling")}>
                   <Text style={styles.TextButton}>Go</Text>
                 </TouchableOpacity>
               </View>
