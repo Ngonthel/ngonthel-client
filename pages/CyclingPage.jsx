@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useState, useEffect } from "react";
 import haversine from "haversine";
 import * as Location from "expo-location";
@@ -134,21 +134,61 @@ export default function CyclingPage() {
     setSeconds(Math.floor(timer % 60));
   }, [timer]);
 
+  const [regionLocation, setRegionLocation] = useState();
+  function followHadler(value) {
+    console.log(value);
+    if (value) {
+      setRegionLocation();
+    }
+    setfollow(value);
+  }
+
   return (
     <View style={styles.AndroidSafeArea}>
-      <View style={styles.CardShadow}>
-        <Text>
+      {/* <View style={styles.CardShadow}> */}
+      <View style={{ alignItems: "center", justifyContent: "center" }}>
+        <Text
+          style={{
+            fontSize: 50,
+            fontWeight: "bold",
+            color: "#696e74",
+          }}
+        >
           {hours.toString().padStart(2, "0")}:
           {minutes.toString().padStart(2, "0")}:
           {seconds.toString().padStart(2, "0")}
         </Text>
       </View>
+      <View style={styles.RowRecentHistory}>
+        <View style={styles.DataShadow}>
+          <View>
+            <Text style={styles.TitleHistory}>Distance</Text>
+            <Text style={styles.DataHistory}>{distanceTravel}</Text>
+          </View>
+        </View>
+        <View style={styles.DataShadow}>
+          <View>
+            <Text style={styles.TitleHistory}>Speed</Text>
+            <Text style={styles.DataHistory}>
+              {currentLocation?.speed} Km/H
+            </Text>
+          </View>
+        </View>
+        <View style={styles.DataShadow}>
+          <View>
+            <Text style={styles.TitleHistory}>Time</Text>
+            <Text style={styles.DataHistory}>387 wH</Text>
+          </View>
+        </View>
+      </View>
+      {/* </View> */}
       {initialRegion && (
         <MapView
           style={styles.map}
+          provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
           region={follow ? initialRegion : false}
-          onRegionChange={() => setfollow(false)}
+          onRegionChangeComplete={(e) => setfollow(false)}
         >
           {currentLocation && (
             <>
@@ -164,18 +204,19 @@ export default function CyclingPage() {
           )}
         </MapView>
       )}
-      <TouchableOpacity
-        style={{
-          // position: 'absolute',
-          bottom: 10,
-          right: -50,
-          width: 2,
-          height: 2,
-        }}
-        onPress={() => setfollow(true)}
-      >
-        <Image source={require("../assets/greenIndicator.png")} />
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              //   position: 'absolute',
+              //   bottom: 10,
+              //   right: -50,
+              width: 2,
+              height: 2,
+            }}
+            onPress={() => setfollow(true)}
+          >
+            <Image source={require("../assets/greenIndicator.png")} />
+          </TouchableOpacity>
+
       <View style={styles.ButtonContainer}>
         <TouchableOpacity
           style={styles.TouchableOpacity}
@@ -190,7 +231,7 @@ export default function CyclingPage() {
 
 const styles = StyleSheet.create({
   AndroidSafeArea: {
-    flex: 1,
+    // flex: 1,
     paddingTop:
       Platform.OS === "android" || Platform.OS === "ios"
         ? StatusBar.currentHeight
@@ -199,11 +240,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   map: {
+    // flex: 1,
     width: "100%",
-    height: "70%",
+    height: "60%",
   },
   CardShadow: {
-    marginBottom: 5,
+    // flex: 1,
+    marginBottom: Platform.OS === "ios" ? 5 : 2,
     backgroundColor: "white",
     borderRadius: 10,
     ...Platform.select({
@@ -226,8 +269,8 @@ const styles = StyleSheet.create({
   },
   TouchableOpacity: {
     borderRadius: 100,
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     backgroundColor: "#FFC329",
     alignItems: "center",
     justifyContent: "center",
@@ -235,5 +278,41 @@ const styles = StyleSheet.create({
   TextButton: {
     fontSize: 20,
     color: "white",
+  },
+  RowRecentHistory: {
+    flexDirection: "row",
+    gap: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+    marginBottom: 5,
+  },
+  DataShadow: {
+    flex: 1,
+    backgroundColor: "white",
+    borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+    padding: Platform.OS === "ios" ? 15 : 7.5,
+    alignItems: "center",
+  },
+  TitleHistory: {
+    fontSize: Platform.OS === "ios" ? 18 : 14,
+    fontWeight: "bold",
+    color: "#293038",
+  },
+  DataHistory: {
+    fontSize: Platform.OS === "ios" ? 14 : 10,
+    textAlign: "center",
+    marginTop: 1,
+    color: "#696e74",
   },
 });
