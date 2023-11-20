@@ -27,23 +27,14 @@ export default function Register() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const handleRegister = async () => {
-    console.log("Name:", name);
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Phone Number:", phoneNumber);
-    console.log("Address:", address);
-    console.log("Gender:", selectGender);
-    
     try {
         const {data} = await register({variables : {content : {
             name, username , email , password , phoneNumber , address , gender:selectGender
         }}})
-        console.log(data.register) , "<><><><>";
         Alert.alert("Success Register , Now you can Login!")
         navigation.navigate('login')
     } catch (error) {
-        Alert.alert("Error Register : " , error)
+        Alert.alert("Error Register")
     }
   };
 
