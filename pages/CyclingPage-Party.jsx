@@ -7,18 +7,49 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  AnimatedRegion,
-} from "react-native-maps";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
 import haversine from "haversine";
 import * as Location from "expo-location";
 import { Platform } from "react-native";
+import Constants from "expo-constants";
+import MapViewDirections from "react-native-maps-directions";
 
-export default function CyclingPage() {
+import firebase from "firebase/compat/app";
+import { getDatabase, ref, set, onValue } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDAkDtPeQz3DCU_Jq5xQvpk80eP2biJ4OM",
+  authDomain: "realtime-tracking-baa73.firebaseapp.com",
+  projectId: "realtime-tracking-baa73",
+  storageBucket: "realtime-tracking-baa73.appspot.com",
+  messagingSenderId: "68954802260",
+  appId: "1:68954802260:web:cdaee239294ac7713945c1",
+  databaseURL:
+    "https://realtime-tracking-baa73-default-rtdb.asia-southeast1.firebasedatabase.app",
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const db = getDatabase();
+
+const { width, height } = Dimensions.get("window");
+
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.02;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const INITIAL_POSITION = {
+  latitude: 40.76711,
+  longitude: -73.979704,
+  latitudeDelta: LATITUDE_DELTA,
+  longitudeDelta: LONGITUDE_DELTA,
+};
+
+const GOOGLE_API_KEY = "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo";
+
+export default function CyclingPage_Party() {
   const [buttonText, setButtonText] = useState("Start");
 
   const handleButtonClick = () => {
@@ -30,6 +61,13 @@ export default function CyclingPage() {
       drawerHis();
     }
   };
+
+  const [origin, setOrigin] = useState();
+  const [destination, setDestination] = useState();
+  const [showDirections, setShowDirections] = useState(false);
+  const [distance, setDistance] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const mapRef = useRef(null);
 
   const [currentLocation, setCurrentLocation] = useState(null);
   const [initialRegion, setInitialRegion] = useState(null);
@@ -58,9 +96,69 @@ export default function CyclingPage() {
       longitudeDelta: 0.005,
     },
   ]);
-  //test animasi
 
   //Funcion
+
+  const moveTo = async (position) => {
+    const camera = await mapRef.current?.getCamera();
+    if (camera) {
+      camera.center = position;
+      mapRef.current?.animateCamera(camera, { duration: 1000 });
+    }
+  };
+
+  const edgePaddingValue = 70;
+  const edgePadding = {
+    top: edgePaddingValue,
+    right: edgePaddingValue,
+    bottom: edgePaddingValue,
+    left: edgePaddingValue,
+  };
+
+  const traceRouteOnReady = (args) => {
+    // console.log(args, "<<<<<<<<<<<<")
+    if (args) {
+      setDistance(args.distance);
+      setDuration(args.duration);
+    }
+  };
+
+  const traceRoute = () => {
+    if (origin && destination) {
+      setShowDirections(true);
+      mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
+    }
+  };
+
+  const onPlaceSelected = (details, flag) => {
+    const set = flag === "origin" ? setOrigin : setDestination;
+    const position = {
+      latitude: details?.geometry.location.lat || 0,
+      longitude: details?.geometry.location.lng || 0,
+    };
+    set(position);
+    moveTo(position);
+  };
+
+  function writeUserData(stau, dua) {
+    set(ref(db, "users/" + first), {
+      username: first,
+      latitude: stau,
+      longitude: dua,
+    });
+  }
+
+  useEffect(() => {
+    const starCountRef = ref(db, "users/");
+    onValue(starCountRef, (snapshot) => {
+      const data = snapshot.val();
+      const newData = Object.keys(data).map((key) => ({
+        ...data[key],
+      }));
+      // console.log(newData, '------')
+      setdataParty(newData);
+    });
+  }, []);
 
   function drawerHis() {
     setRun(false);
@@ -89,7 +187,12 @@ export default function CyclingPage() {
     console.log(location, "LOC");
 
     if (run) {
+      writeUserData(location.coords.latitude, location.coords.longitude);
+    }
+
+    if (run) {
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
+      console.log(distance);
       if (distance > 10) {
         setPrevLocation([...prevLocation, initialRegion]);
         const distancePls = distanceTravel + distance;
@@ -125,9 +228,9 @@ export default function CyclingPage() {
   useEffect(() => {
     const time = setInterval(() => {
       if (run === true) {
+        getLocation();
         const totalTime = timer + 1;
         setTimer(totalTime);
-        getLocation();
       }
     }, 1000);
 
@@ -143,6 +246,9 @@ export default function CyclingPage() {
     setMinutes(Math.floor((timer % 3600) / 60));
     setSeconds(Math.floor(timer % 60));
   }, [timer]);
+
+  const [dataParty, setdataParty] = useState([]);
+  const [first, setfirst] = useState("dani");
 
   const [regionLocation, setRegionLocation] = useState();
   function followHadler(value) {
@@ -187,38 +293,48 @@ export default function CyclingPage() {
       {/* </View> */}
       {initialRegion && (
         <MapView
+          ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          initialRegion={initialRegion}
+          initialRegion={INITIAL_POSITION}
           region={follow ? initialRegion : regionLocation}
           onTouchEnd={() => followHadler(false)}
+          loadingEnabled
         >
+          {origin && <Marker coordinate={origin} />}
+          {destination && <Marker coordinate={destination} />}
+          {showDirections && origin && destination && (
+            <MapViewDirections
+              origin={initialRegion}
+              destination={destination}
+              apikey={GOOGLE_API_KEY}
+              strokeColor="#6644ff"
+              strokeWidth={4}
+              onReady={traceRouteOnReady}
+              mode="DRIVING"
+            />
+          )}
           {currentLocation && (
             <>
               <Marker.Animated
                 coordinate={{
-                  latitude: initialRegion.latitude,
-                  longitude: initialRegion.longitude,
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
                 }}
                 title="Your Location"
-              >
-                <Image
-                  source={require("../assets/bike.png")}
-                  style={{
-                    width: 50,
-                    height: 50,
-                    transform: [{ rotate: `${currentLocation?.heading}deg` }],
-                  }}
-                  resizeMode="contain"
-                />
-              </Marker.Animated>
-              <Polyline
-                coordinates={prevLocation}
-                strokeWidth={4}
-                strokeColor="#FFC329"
               />
+              <Polyline coordinates={prevLocation} strokeWidth={3} />
             </>
           )}
+          {dataParty.map((el, i) => {
+            return (
+              <Marker
+                key={i}
+                coordinate={{ latitude: el.latitude, longitude: el.longitude }}
+                title={el.username}
+              />
+            );
+          })}
         </MapView>
       )}
 
@@ -246,7 +362,7 @@ export default function CyclingPage() {
     </View>
   );
 }
-const { width, height } = Dimensions.get("window");
+
 const isAndroid = Platform.OS === "android";
 const styles = StyleSheet.create({
   AndroidSafeArea: {
