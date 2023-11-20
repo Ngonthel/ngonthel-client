@@ -5,10 +5,12 @@ import {
   StyleSheet,
   StatusBar,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import React, { useState, useEffect } from "react";
 import haversine from "haversine";
+import * as Location from "expo-location";
 
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
@@ -30,6 +32,7 @@ export default function CyclingPage() {
   const [distanceTravel, setDistanceTravel] = useState(0);
   const [locFirst, setLocFirst] = useState(null);
   const [timer, setTimer] = useState(0);
+  const [follow, setfollow] = useState(true);
 
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -65,7 +68,9 @@ export default function CyclingPage() {
       return;
     }
 
-    let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.BestForNavigation,
+    });
     setCurrentLocation(location.coords);
 
     setInitialRegion({
@@ -142,9 +147,8 @@ export default function CyclingPage() {
         <MapView
           style={styles.map}
           initialRegion={initialRegion}
-          showsUserLocation
-          followsUserLocation
-          region={initialRegion}
+          region={follow ? initialRegion : false}
+          onRegionChange={() => setfollow(false)}
         >
           {currentLocation && (
             <>
@@ -160,6 +164,18 @@ export default function CyclingPage() {
           )}
         </MapView>
       )}
+      <TouchableOpacity
+        style={{
+          // position: 'absolute',
+          bottom: 10,
+          right: -50,
+          width: 2,
+          height: 2,
+        }}
+        onPress={() => setfollow(true)}
+      >
+        <Image source={require("../assets/greenIndicator.png")} />
+      </TouchableOpacity>
       <View style={styles.ButtonContainer}>
         <TouchableOpacity
           style={styles.TouchableOpacity}
