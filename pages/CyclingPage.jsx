@@ -1,24 +1,31 @@
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  AnimatedRegion,
-} from "react-native-maps";
+import { View, Text, Dimensions, StyleSheet, StatusBar, TouchableOpacity, Image } from "react-native";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE, AnimatedRegion } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
 import haversine from "haversine";
 import * as Location from "expo-location";
 import { Platform } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const CREATE_HISTORY = gql`
+  mutation CreateHistory($headers: Headers!) {
+    createHistory(headers: $headers) {
+      acknowledged
+      insertedId
+    }
+  }
+`;
+
+const UPDATE_HISTORY = gql`
+  mutation UpdateHistory($updateHistoryId: ID!, $headers: Headers!, $content: UpdateData) {
+    updateHistory(id: $updateHistoryId, headers: $headers, content: $content) {
+      acknowledged
+      point
+      time
+    }
+  }
+`;
 
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
@@ -37,16 +44,17 @@ export default function CyclingPage() {
   const [initialRegion, setInitialRegion] = useState(null);
 
   const [run, setRun] = useState(false);
-  const [distanceTravel, setDistanceTravel] = useState(0);
+  const [distanceTravel, setDistanceTravel] = useState(1);
   const [locFirst, setLocFirst] = useState(null);
   const [timer, setTimer] = useState(0);
   const [follow, setfollow] = useState(true);
-  const [avgSpeed, setAvgSpeed] = useState([])
+  const [avgSpeed, setAvgSpeed] = useState([1]);
 
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
+  //test animasi
   const [prevLocation, setPrevLocation] = useState([
     {
       latitude: 0,
@@ -61,19 +69,55 @@ export default function CyclingPage() {
       longitudeDelta: 0.005,
     },
   ]);
-  //test animasi
 
   function calculateAvgSpeed() {
-    return avgSpeed.reduce((a, b) => a + b, 0) / avgSpeed.length
+    return avgSpeed.reduce((a, b) => a + b, 0) / avgSpeed.length;
   }
   //Funcion
+
+  // CEK TOKEN
+  const [token, setToken] = useState("");
+
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setToken(token);
+  };
+
+  useEffect(() => {
+    cekToken();
+  }, []);
 
   function drawerHis() {
     setRun(false);
     setPrevLocation([initialRegion]);
     setDistanceTravel(0);
-    const avgSpd = calculateAvgSpeed()
-    console.log(avgSpd)
+    const avgSpd = calculateAvgSpeed();
+
+    console.log({
+      token,
+      id: data?.createHistory?.insertedId,
+      content: {
+        avgSpeed: avgSpd,
+        distance: distanceTravel,
+        time: timer,
+        trackLine: prevLocation,
+      },
+    });
+
+    updateHistory({
+      variables: {
+        headers: {
+          access_token: token,
+        },
+        updateHistoryId: data?.createHistory?.insertedId,
+        content: {
+          avgSpeed: avgSpd,
+          distance: distanceTravel,
+          time: timer,
+          trackLine: prevLocation,
+        },
+      },
+    });
   }
 
   const getLocation = async () => {
@@ -99,7 +143,7 @@ export default function CyclingPage() {
     if (run) {
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       if (distance > 10) {
-        setAvgSpeed([...avgSpeed, location.coords.speed])
+        setAvgSpeed([...avgSpeed, location.coords.speed]);
         setPrevLocation([...prevLocation, initialRegion]);
         const distancePls = distanceTravel + distance;
         const distanceResult = Math.round(distancePls * 100) / 100;
@@ -143,8 +187,22 @@ export default function CyclingPage() {
     return () => clearInterval(time);
   });
 
+  const [createHistory, { data, loading, error }] = useMutation(CREATE_HISTORY, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+    },
+  });
+
+  const [updateHistory, { data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_HISTORY);
+
+  console.log(data, loading, error, "CREATE");
+  console.log(updateData, updateLoading, updateError, "UPDATE");
+
   function startHandler() {
     setRun(true);
+    createHistory();
   }
 
   useEffect(() => {
@@ -164,7 +222,6 @@ export default function CyclingPage() {
   return (
     <View style={styles.AndroidSafeArea}>
       {/* <View style={styles.CardShadow}> */}
-
 
       {/* </View> */}
       {initialRegion && (
@@ -196,34 +253,31 @@ export default function CyclingPage() {
                   resizeMode="contain"
                 />
               </Marker.Animated>
-              <Polyline
-                coordinates={prevLocation}
-                strokeWidth={4}
-                strokeColor="#FFC329"
-              />
+              <Polyline coordinates={prevLocation} strokeWidth={4} strokeColor="#FFC329" />
             </>
           )}
         </MapView>
       )}
 
-
       <View className="shadow-2xl" style={styles.ButtonContainer}>
-        <TouchableOpacity
-          onPress={() => setfollow(true)}
-        >
+        <TouchableOpacity onPress={() => setfollow(true)}>
           <MaterialIcons
             style={{
               position: "absolute",
               padding: 8,
-              backgroundColor: 'white',
+              backgroundColor: "white",
               borderRadius: 4,
               // zIndex: 99,
-              top: -1 / 14 * height,
+              top: (-1 / 14) * height,
               right: 0,
               // width: 1 / 2 * width,
               // height: 1/3,
-              elevation: 5
-            }} name="my-location" size={24} color="#1640D6" />
+              elevation: 5,
+            }}
+            name="my-location"
+            size={24}
+            color="#1640D6"
+          />
         </TouchableOpacity>
         <View style={styles.RowRecentHistory}>
           <View style={styles.DataShadow}>
@@ -235,9 +289,7 @@ export default function CyclingPage() {
           <View style={styles.DataShadow}>
             <View>
               <Text style={styles.TitleHistory}>Speed</Text>
-              <Text style={styles.DataHistory}>
-                {Math.round(currentLocation?.speed * 100) / 100} m/s
-              </Text>
+              <Text style={styles.DataHistory}>{Math.round(currentLocation?.speed * 100) / 100} m/s</Text>
             </View>
           </View>
         </View>
@@ -249,14 +301,12 @@ export default function CyclingPage() {
               color: "#696e74",
             }}
           >
-            {hours.toString().padStart(2, "0")}:
-            {minutes.toString().padStart(2, "0")}:
-            {seconds.toString().padStart(2, "0")}
+            {hours.toString().padStart(2, "0")}:{minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
           </Text>
         </View>
         <TouchableOpacity
           // style={styles.TouchableOpacity}
-          style={[styles.TouchableOpacity, { backgroundColor: run ? 'red' : "#FFC329" }]}
+          style={[styles.TouchableOpacity, { backgroundColor: run ? "red" : "#FFC329" }]}
           onPress={handleButtonClick}
         >
           <Text style={styles.TextButton}>{buttonText}</Text>
@@ -295,22 +345,22 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 2,
-        backgroundColor: "green"
+        backgroundColor: "green",
       },
     }),
     padding: Platform.OS === "ios" ? 8 : 7.5,
   },
   ButtonContainer: {
-    position: 'absolute',
+    position: "absolute",
     alignSelf: "center",
     justifyContent: "center",
     marginTop: 10,
     padding: 10,
     width: 0.95 * width,
-    bottom: 1 / 7 * height,
+    bottom: (1 / 7) * height,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
 
     // borderColor: '#FFC329',
     // borderWidth: 1
@@ -335,12 +385,11 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
-
   },
   TextButton: {
     fontSize: 20,
     color: "white",
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   RowRecentHistory: {
     flexDirection: "row",
