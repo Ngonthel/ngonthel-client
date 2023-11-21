@@ -44,11 +44,11 @@ export default function CyclingPage() {
   const [initialRegion, setInitialRegion] = useState(null);
 
   const [run, setRun] = useState(false);
-  const [distanceTravel, setDistanceTravel] = useState(1);
+  const [distanceTravel, setDistanceTravel] = useState(0);
   const [locFirst, setLocFirst] = useState(null);
   const [timer, setTimer] = useState(0);
   const [follow, setfollow] = useState(true);
-  const [avgSpeed, setAvgSpeed] = useState([1]);
+  const [avgSpeed, setAvgSpeed] = useState([0]);
 
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -88,36 +88,39 @@ export default function CyclingPage() {
   }, []);
 
   function drawerHis() {
-    setRun(false);
-    setPrevLocation([initialRegion]);
-    setDistanceTravel(0);
+    // console.log({
+    //   token,
+    //   id: data?.createHistory?.insertedId,
+    //   content: {
+    //     avgSpeed: avgSpd,
+    //     distance: distanceTravel,
+    //     time: timer,
+    //     trackLine: prevLocation,
+    //   },
+    // });
+
     const avgSpd = calculateAvgSpeed();
-
-    console.log({
-      token,
-      id: data?.createHistory?.insertedId,
-      content: {
-        avgSpeed: avgSpd,
-        distance: distanceTravel,
-        time: timer,
-        trackLine: prevLocation,
-      },
-    });
-
-    updateHistory({
-      variables: {
-        headers: {
-          access_token: token,
+    if (distanceTravel > 0 && avgSpd > 0 && timer > 0) {
+      setRun(false);
+      setPrevLocation([initialRegion]);
+      setDistanceTravel(0);
+      updateHistory({
+        variables: {
+          headers: {
+            access_token: token,
+          },
+          updateHistoryId: data?.createHistory?.insertedId,
+          content: {
+            avgSpeed: avgSpd,
+            distance: distanceTravel,
+            time: timer,
+            trackLine: prevLocation,
+          },
         },
-        updateHistoryId: data?.createHistory?.insertedId,
-        content: {
-          avgSpeed: avgSpd,
-          distance: distanceTravel,
-          time: timer,
-          trackLine: prevLocation,
-        },
-      },
-    });
+      });
+    } else {
+      alert("Kamu harus bergerak untuk menyimpan history!");
+    }
   }
 
   const getLocation = async () => {
@@ -138,7 +141,7 @@ export default function CyclingPage() {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
-    console.log(location, "LOC");
+    // console.log(location, "LOC");
 
     if (run) {
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
@@ -151,7 +154,7 @@ export default function CyclingPage() {
         setLocFirst(initialRegion);
       }
     } else {
-      console.log("ga maiin");
+      // console.log("ga maiin");
       if (location) {
         setPrevLocation([
           {
@@ -172,7 +175,7 @@ export default function CyclingPage() {
   useEffect(() => {
     getLocation();
     getLocation();
-    console.log("jalan");
+    // console.log("jalan");
   }, []);
 
   useEffect(() => {
@@ -197,8 +200,8 @@ export default function CyclingPage() {
 
   const [updateHistory, { data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_HISTORY);
 
-  console.log(data, loading, error, "CREATE");
-  console.log(updateData, updateLoading, updateError, "UPDATE");
+  // console.log(data, loading, error, "CREATE");
+  // console.log(updateData, updateLoading, updateError, "UPDATE");
 
   function startHandler() {
     setRun(true);
