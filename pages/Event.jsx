@@ -6,49 +6,65 @@ import {
   Platform,
   FlatList,
   Dimensions,
+  TouchableOpacity
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Tab, TabView } from "@rneui/themed";
 import CardEvent from "../components/CardEvent";
-import CardLeader from '../components/CardLeaderboard'
+import {
+  ApolloClient,
+  InMemoryCache,
+  useQuery,
+  ApolloProvider,
+  gql,
+} from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const GET_EVENTS = gql`
+  query GetEvents($headers: Headers!, $filter: String) {
+  getEvents(headers: $headers, filter: $filter) {
+    _id
+    name
+    eventCode
+    eventDate
+    createdBy
+    isActive
+    from {
+      altitude
+      longtitude
+      latitude
+    }
+    dest {
+      altitude
+      longtitude
+      latitude
+    }
+  }
+}
+`;
 export default function Event() {
-  const DATA = [
-    {
-      startTime: "2023-11-18T08:00:00",
-      endTime: "2023-11-18T09:30:00",
-      avgSpeed: 15.5,
-      point: "A to B",
-      distance: 20.3,
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    cekToken();
+  }, []);
+
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setToken(token);
+  };
+
+  const { data, loading, error } = useQuery(GET_EVENTS, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+      filter: "active"
     },
-    {
-      startTime: "2023-11-19T14:30:00",
-      endTime: "2023-11-19T16:00:00",
-      avgSpeed: 12.2,
-      point: "C to D",
-      distance: 15.8,
-    },
-    {
-      startTime: "2023-11-20T09:45:00",
-      endTime: "2023-11-20T11:15:00",
-      avgSpeed: 18.0,
-      point: "E to F",
-      distance: 25.1,
-    },
-    {
-      startTime: "2023-11-21T07:15:00",
-      endTime: "2023-11-21T08:00:00",
-      avgSpeed: 10.5,
-      point: "G to H",
-      distance: 12.7,
-    },
-    {
-      startTime: "2023-11-22T17:30:00",
-      endTime: "2023-11-22T19:00:00",
-      avgSpeed: 14.8,
-      point: "I to J",
-      distance: 18.4,
-    },
-  ];
+  });
+
+  console.log(data);
+
   const [index, setIndex] = useState(0);
   return (
     <View style={styles.AndroidSafeArea}>
@@ -109,25 +125,28 @@ export default function Event() {
         animationType="spring"
         style={styles.tabViewContainer}
       >
-        <TabView.Item
-        style={styles.tabViewItem}
-        >
+        <TabView.Item style={styles.tabViewItem}>
           <FlatList
-            data={DATA}
+            data={data?.getEvents}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <CardEvent item={item} />}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
           />
         </TabView.Item>
-        <TabView.Item 
-        style={styles.tabViewItem}
-        >
+        <TabView.Item style={styles.tabViewItem}>
           <Text h1>Favorite</Text>
+         
         </TabView.Item>
-        <TabView.Item 
-        style={styles.tabViewItem}
-        >
-          <Text h1>Your Event</Text>
+        <TabView.Item style={styles.tabViewItem}>
+          {/* <Text h1>Your Event</Text> */}
+          <View>
+            <Text></Text>
+          </View>
+          <TouchableOpacity style={styles.TouchableOpacity}>
+            <Text style={styles.TextButton}>
+              Create Event
+            </Text>
+          </TouchableOpacity>
         </TabView.Item>
       </TabView>
     </View>
@@ -141,7 +160,7 @@ const styles = StyleSheet.create({
       Platform.OS === "android" || Platform.OS === "ios"
         ? StatusBar.currentHeight
         : 0,
-    paddingHorizontal: 14,
+    // paddingHorizontal: 14,
     backgroundColor: "white",
   },
   RowRecentHistory: {
@@ -185,8 +204,25 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   tabViewItem: {
-    // width: "100%",
-    flex: 1,
-    backgroundColor: 'blue'
+    width: "100%",
+    // justifyContent: 'center',
+    alignContent: "center",
+    alignItems: "center",
+    // flex: 1,
+    // backgroundColor: 'blue',
+    padding: 5,
+    // marginLeft: 10
+  },
+  TouchableOpacity: {
+    borderRadius: 10,
+    width: "30%",
+    height: 25,
+    backgroundColor: "#FFC329",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  TextButton: {
+    fontSize: 14,
+    color: "white",
   },
 });

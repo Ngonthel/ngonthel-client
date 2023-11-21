@@ -34,6 +34,7 @@ export default function Register() {
         Alert.alert("Success Register , Now you can Login!")
         navigation.navigate('login')
     } catch (error) {
+      console.log(error, "<<<<<<<<<");
         Alert.alert("Error Register")
     }
   };

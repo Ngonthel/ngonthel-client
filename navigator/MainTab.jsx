@@ -10,7 +10,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import Event from "../pages/Event";
+import EventStack from "./EventStack";
 
 export default function MainTab() {
   //   const Tab = createBottomTabNavigator();
@@ -55,7 +55,7 @@ export default function MainTab() {
       />
       <Tab.Screen
         name="event"
-        component={Event}
+        component={EventStack}
         options={{
           title: "Event",
           tabBarLabelStyle: { color: "#293038", fontSize: 16 },
