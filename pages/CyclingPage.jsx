@@ -17,6 +17,8 @@ import React, { useState, useEffect, useRef } from "react";
 import haversine from "haversine";
 import * as Location from "expo-location";
 import { Platform } from "react-native";
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
@@ -155,35 +157,8 @@ export default function CyclingPage() {
   return (
     <View style={styles.AndroidSafeArea}>
       {/* <View style={styles.CardShadow}> */}
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <Text
-          style={{
-            fontSize: 50,
-            fontWeight: "bold",
-            color: "#696e74",
-          }}
-        >
-          {hours.toString().padStart(2, "0")}:
-          {minutes.toString().padStart(2, "0")}:
-          {seconds.toString().padStart(2, "0")}
-        </Text>
-      </View>
-      <View style={styles.RowRecentHistory}>
-        <View style={styles.DataShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Distance</Text>
-            <Text style={styles.DataHistory}>{distanceTravel} m</Text>
-          </View>
-        </View>
-        <View style={styles.DataShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Speed</Text>
-            <Text style={styles.DataHistory}>
-              {Math.round(currentLocation?.speed * 100) / 100} m/s
-            </Text>
-          </View>
-        </View>
-      </View>
+
+
       {/* </View> */}
       {initialRegion && (
         <MapView
@@ -192,6 +167,7 @@ export default function CyclingPage() {
           initialRegion={initialRegion}
           region={follow ? initialRegion : regionLocation}
           onTouchEnd={() => followHadler(false)}
+          loadingEnabled
         >
           {currentLocation && (
             <>
@@ -200,13 +176,14 @@ export default function CyclingPage() {
                   latitude: initialRegion.latitude,
                   longitude: initialRegion.longitude,
                 }}
+                anchor={{ x: 0.5, y: 0.5 }}
                 title="Your Location"
               >
                 <Image
                   source={require("../assets/bike.png")}
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: 65,
+                    height: 65,
                     transform: [{ rotate: `${currentLocation?.heading}deg` }],
                   }}
                   resizeMode="contain"
@@ -222,22 +199,57 @@ export default function CyclingPage() {
         </MapView>
       )}
 
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          top: Platform.OS === "ios" ? 400 : 500,
-          left: 10,
-          width: 2,
-          height: 2,
-        }}
-        onPress={() => setfollow(true)}
-      >
-        <Image source={require("../assets/greenIndicator.png")} />
-      </TouchableOpacity>
 
-      <View style={styles.ButtonContainer}>
+      <View className="shadow-2xl" style={styles.ButtonContainer}>
         <TouchableOpacity
-          style={styles.TouchableOpacity}
+          onPress={() => setfollow(true)}
+        >
+          <MaterialIcons
+            style={{
+              position: "absolute",
+              padding: 8,
+              backgroundColor: 'white',
+              borderRadius: 4,
+              // zIndex: 99,
+              top: -1 / 14 * height,
+              right: 0,
+              // width: 1 / 2 * width,
+              // height: 1/3,
+              elevation: 5
+            }} name="my-location" size={24} color="#1640D6" />
+        </TouchableOpacity>
+        <View style={styles.RowRecentHistory}>
+          <View style={styles.DataShadow}>
+            <View>
+              <Text style={styles.TitleHistory}>Distance</Text>
+              <Text style={styles.DataHistory}>{distanceTravel} m</Text>
+            </View>
+          </View>
+          <View style={styles.DataShadow}>
+            <View>
+              <Text style={styles.TitleHistory}>Speed</Text>
+              <Text style={styles.DataHistory}>
+                {Math.round(currentLocation?.speed * 100) / 100} m/s
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <Text
+            style={{
+              fontSize: 50,
+              fontWeight: "bold",
+              color: "#696e74",
+            }}
+          >
+            {hours.toString().padStart(2, "0")}:
+            {minutes.toString().padStart(2, "0")}:
+            {seconds.toString().padStart(2, "0")}
+          </Text>
+        </View>
+        <TouchableOpacity
+          // style={styles.TouchableOpacity}
+          style={[styles.TouchableOpacity, { backgroundColor: run ? 'red' : "#FFC329" }]}
           onPress={handleButtonClick}
         >
           <Text style={styles.TextButton}>{buttonText}</Text>
@@ -255,20 +267,18 @@ const styles = StyleSheet.create({
     //   Platform.OS === "android" || Platform.OS === "ios"
     //     ? StatusBar.currentHeight
     //     : 0,
-    paddingHorizontal: 14,
     backgroundColor: "white",
     // width: isAndroid ? width : width * 1,
     height: isAndroid ? height : height * 0.83,
   },
   map: {
-    // flex: 1,
-    width: "100%",
-    height: "55%",
+    flex: 1,
+    // width: "100%",
+    // height: "55%",
   },
   CardShadow: {
     // flex: 1,
     marginBottom: Platform.OS === "ios" ? 5 : 2,
-    backgroundColor: "white",
     borderRadius: 10,
     ...Platform.select({
       ios: {
@@ -278,28 +288,52 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 2,
+        backgroundColor: "green"
       },
     }),
     padding: Platform.OS === "ios" ? 8 : 7.5,
   },
   ButtonContainer: {
-    // position: 'absolute',
-    alignItems: "center",
+    position: 'absolute',
+    alignSelf: "center",
     justifyContent: "center",
     marginTop: 10,
-    // backgroundColor: 'red'
+    padding: 10,
+    width: 0.95 * width,
+    bottom: 1 / 7 * height,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    backgroundColor: 'white',
+
+    // borderColor: '#FFC329',
+    // borderWidth: 1
+    // backgroundColor: 'rgba(255, 255, 255,1)'
   },
   TouchableOpacity: {
-    borderRadius: 100,
-    width: 80,
-    height: 80,
-    backgroundColor: "#FFC329",
-    alignItems: "center",
+    borderRadius: 20,
+    width: 200,
+    height: 45,
+    // backgroundColor: "",
+    alignSelf: "center",
     justifyContent: "center",
+    margin: 10,
+    borderRadius: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+
   },
   TextButton: {
     fontSize: 20,
     color: "white",
+    alignSelf: 'center'
   },
   RowRecentHistory: {
     flexDirection: "row",
