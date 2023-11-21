@@ -6,18 +6,20 @@ import History from "../pages/History";
 import DetailEvent from "../pages/DetailEvent";
 import CyclingPage from "../pages/CyclingPage";
 import MapV3 from "../pages/CreateEvent";
+import CyclingPage_Party from "../pages/CyclingPage-Party";
 
-export default function MainStack(){
+export default function MainStack() {
     const Stack = createNativeStackNavigator()
-    return(
+    return (
         <Stack.Navigator >
             <Stack.Screen name="home" component={Home} options={{ headerShown: false }} />
             <Stack.Screen name="login" component={Login} options={{ headerShown: false }} />
             <Stack.Screen name="History" component={History} />
+            <Stack.Screen name="CyclingParty" component={CyclingPage_Party} />
             <Stack.Screen name="Cycling" component={CyclingPage} />
        
         </Stack.Navigator>
     )
-    
+
 }
 
