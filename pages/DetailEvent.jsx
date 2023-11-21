@@ -39,6 +39,7 @@ const GET_EVENT_DETAIL = gql`
   }
 `;
 
+
 export default function DetailEvent({ navigation }) {
   const route = useRoute();
   const { id } = route.params;
@@ -77,6 +78,9 @@ export default function DetailEvent({ navigation }) {
     },
   });
 
+  console.log(data)
+
+
   const edgePaddingValue = 50;
   const edgePadding = {
     top: edgePaddingValue,
@@ -92,18 +96,18 @@ export default function DetailEvent({ navigation }) {
     }
   };
   const origin = {
-    latitude: data?.getEventDetail?.from.latitude,
-    longitude: data?.getEventDetail?.from.longtitude,
+    latitude: data?.getEventDetail?.from?.latitude,
+    longitude: data?.getEventDetail?.from?.longtitude,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   };
   const destination = {
-    latitude: data?.getEventDetail?.dest.latitude,
-    longitude: data?.getEventDetail?.dest.longtitude,
+    latitude: data?.getEventDetail?.dest?.latitude,
+    longitude: data?.getEventDetail?.dest?.longtitude,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   };
-
+  console.log(origin, destination)
   return (
     <View style={styles.AndroidSafeArea}>
       <MapView
@@ -111,18 +115,20 @@ export default function DetailEvent({ navigation }) {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
       >
-        {data?.getEventDetail && (
-          <MapViewDirections
-            apikey={GOOGLE_API_KEY}
-            strokeColor="#6644ff"
-            strokeWidth={4}
-            origin={origin}
-            destination={destination}
-            onReady={traceRoute}
-          />
+        {!loading && origin && destination && (
+          <>
+            <MapViewDirections
+              apikey={GOOGLE_API_KEY}
+              strokeColor="#6644ff"
+              strokeWidth={4}
+              origin={origin}
+              destination={destination}
+              onReady={traceRoute}
+            />
+            <Marker coordinate={origin} />
+            <Marker coordinate={destination} />
+          </>
         )}
-        {origin && <Marker coordinate={origin} />}
-        {destination && <Marker coordinate={destination} />}
       </MapView>
       <View style={{ paddingHorizontal: "5%" }}>
         <Text
