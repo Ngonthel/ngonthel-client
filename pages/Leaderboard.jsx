@@ -7,81 +7,67 @@ import {
   ScrollView,
   FlatList,
   Platform,
+  Alert,
 } from "react-native";
 import Cardlead from "../components/CardLeaderboard";
+import {
+  ApolloClient,
+  InMemoryCache,
+  useQuery,
+  ApolloProvider,
+  gql,
+} from "@apollo/client";
+import { useEffect, useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Leaderboard() {
-  const DATA = [
-    {
-      id: "1",
-      title : "res"
-    },
-    {
-      id: "2",
-      title : "res"
-    },
-    {
-      id: "3",
-      title : "res"
-    },
-    {
-      id: "4",
-      title : "res"
-    },
-    {
-      id: "5",
-      title : "res"
-    },
-    {
-      id: "6",
-      title : "res"
-    },
-    {
-      id: "7",
-      title : "res"
-    },
-    {
-      id: "8",
-      title : "res"
-    },
-    {
-      id: "9",
-      title : "res"
-    },
-    {
-      id: "10",
-      title : "res"
-    },
-    {
-      id: "11",
-      title : "res"
-    },
-    {
-      id: "12",
-      title : "res"
-    },
-    {
-      id: "13",
-      title : "res"
-    },
-    {
-      id: "14",
-      title : "res"
-    },
-    {
-      id: "15",
-      title : "res"
-    },
-    {
-      id: "16",
-      title : "res"
-    },
-    {
-      id: "17",
-      title : "res"
-    },
 
-  ];
+  const [leaderboard , setLeaderboard] = useState(null)
+
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    return token;
+  };
+
+  const getLeaderboard = async () => {
+    const GET_LEADERBOARD = gql`
+      query GetLeaderboard($headers: Headers!) {
+        getLeaderboard(headers: $headers) {
+          _id
+          name
+          totalPoint
+        }
+      }
+    `
+
+    try {
+        const client = new ApolloClient({
+          uri : 'http://18.140.54.54:3000/',
+          cache: new InMemoryCache()
+        })
+
+        const {data} = await client.query({
+          query: GET_LEADERBOARD,
+          variables : {
+            headers: {
+              access_token: await cekToken()
+            }
+          }
+        })
+        // console.log(leaderboard,"<><><><><>");
+        setLeaderboard(data.getLeaderboard)
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error Getting Leaderboard,Check your Connection!")
+    }
+  }
+
+  useEffect(() => {
+    // console.log(leaderboard, "<<<<<<<<<<<<<<");
+    getLeaderboard()
+  })
+
+  // console.log(leaderboard, "<><><><><");
 
   return (
     <ImageBackground
@@ -96,11 +82,13 @@ export default function Leaderboard() {
           <Cardlead />
         </ScrollView> */}
         <FlatList
-        style={styles.containerList}
-          data={DATA}
+          style={styles.containerList}
+          data={leaderboard}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item  , index}) => <Cardlead title={item.title} index={index} />}
-          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <Cardlead key={index} data={item} index={index} />
+          )}
+          keyExtractor={(item) => item._id}
         />
       </View>
     </ImageBackground>
@@ -110,7 +98,10 @@ export default function Leaderboard() {
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     flex: 1,
-    paddingTop: Platform.OS === "android" || Platform.OS === 'ios' ? StatusBar.currentHeight : 0,
+    paddingTop:
+      Platform.OS === "android" || Platform.OS === "ios"
+        ? StatusBar.currentHeight
+        : 0,
     paddingHorizontal: 14,
   },
   titleContainer: {

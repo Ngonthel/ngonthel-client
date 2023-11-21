@@ -33,7 +33,7 @@ export default function App() {
     const token = await AsyncStorage.getItem('access_token')
     if (token) {
       console.log('masuk if');
-      console.log(token , "<<<<");
+      // console.log(token , "<<<<");
       updateIsLoggedIn(true);
     }
   }
