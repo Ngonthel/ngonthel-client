@@ -314,6 +314,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  Coin: {
+    fontSize: Platform.OS === "ios" ? 16 : 12,
+    marginTop: 1,
+    color: "#696e74",
+  }
 });
 
 export default HomePage;

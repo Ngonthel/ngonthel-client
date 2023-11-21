@@ -4,6 +4,7 @@ import Leaderboard from "../pages/Leaderboard";
 import Login from "../pages/Login";
 import History from "../pages/History";
 import CyclingPage from "../pages/CyclingPage";
+
 export default function MainStack(){
     const Stack = createNativeStackNavigator()
     return(
