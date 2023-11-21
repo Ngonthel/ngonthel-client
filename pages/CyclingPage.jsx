@@ -111,8 +111,8 @@ export default function CyclingPage() {
           },
           updateHistoryId: data?.createHistory?.insertedId,
           content: {
-            avgSpeed: avgSpd,
-            distance: distanceTravel,
+            avgSpeed: Math.round(avgSpd * 100) / 100,
+            distance: Math.round(distanceTravel),
             time: timer,
             trackLine: prevLocation,
           },

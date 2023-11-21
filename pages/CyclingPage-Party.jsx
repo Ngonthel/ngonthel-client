@@ -22,6 +22,29 @@ import firebase from "firebase/compat/app";
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import Bike from '../assets/personal-bike.svg'
 import Start from '../assets/starts-logo.svg'
+import { useRoute } from "@react-navigation/core";
+import { useMutation, gql } from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+const CREATE_HISTORY = gql`
+  mutation CreateHistory($headers: Headers!) {
+    createHistory(headers: $headers) {
+      acknowledged
+      insertedId
+    }
+  }
+`;
+
+const UPDATE_HISTORY = gql`
+  mutation UpdateHistory($updateHistoryId: ID!, $headers: Headers!, $content: UpdateData) {
+    updateHistory(id: $updateHistoryId, headers: $headers, content: $content) {
+      acknowledged
+      point
+      time
+    }
+  }
+`;
 
 const firebaseConfig = {
   apiKey: "AIzaSyDAkDtPeQz3DCU_Jq5xQvpk80eP2biJ4OM",
@@ -56,6 +79,9 @@ const GOOGLE_API_KEY = "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo";
 
 export default function CyclingPage_Party() {
   const [buttonText, setButtonText] = useState("Start");
+  const route = useRoute()
+  const { eventCode, username, origin: originEvent, destination: destinationEvent } = route.params
+  // console.log(eventCode, username, originEvent, destinationEvent)
 
   const handleButtonClick = () => {
     if (buttonText === "Start") {
@@ -87,6 +113,9 @@ export default function CyclingPage_Party() {
   const [duration, setDuration] = useState(0);
   const mapRef = useRef(null);
 
+  const [avgSpeed, setAvgSpeed] = useState([0]);
+
+
   const [currentLocation, setCurrentLocation] = useState(null);
   const [initialRegion, setInitialRegion] = useState(null);
 
@@ -117,6 +146,13 @@ export default function CyclingPage_Party() {
 
   //Funcion
 
+  const [token, setToken] = useState("");
+
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setToken(token);
+  };
+
   const moveTo = async (position) => {
     const camera = await mapRef.current?.getCamera();
     if (camera) {
@@ -141,48 +177,104 @@ export default function CyclingPage_Party() {
     }
   };
 
-  const traceRoute = () => {
-    if (origin && destination) {
-      setShowDirections(true);
-      mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
-    }
-  };
+  // const traceRoute = () => {
+  //   if (origin && destination) {
+  //     setShowDirections(true);
+  //     mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
+  //   }
+  // };
 
-  const onPlaceSelected = (details, flag) => {
-    const set = flag === "origin" ? setOrigin : setDestination;
-    const position = {
-      latitude: details?.geometry.location.lat || 0,
-      longitude: details?.geometry.location.lng || 0,
-    };
-    set(position);
-    moveTo(position);
-  };
+  // const onPlaceSelected = (details, flag) => {
+  //   const set = flag === "origin" ? setOrigin : setDestination;
+  //   const position = {
+  //     latitude: details?.geometry.location.lat || 0,
+  //     longitude: details?.geometry.location.lng || 0,
+  //   };
+  //   set(position);
+  //   moveTo(position);
+  // };
 
-  function writeUserData(stau, dua) {
-    set(ref(db, "users/" + first), {
-      username: first,
-      latitude: stau,
+  function writeUserData(satu, dua) {
+    set(ref(db, eventCode + "/" + username), {
+      username: username,
+      latitude: satu,
       longitude: dua,
     });
   }
 
+  async function getDataReaktime() {
+    try {
+      const starCountRef = ref(db, eventCode + "/");
+      onValue(starCountRef, (snapshot) => {
+        const data = snapshot.val();
+        const newData = Object.keys(data).map((key) => ({
+          ...data[key],
+        }));
+        console.log(newData, '------')
+        if (data.length > 0) {
+
+        }
+        setdataParty(newData);
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    const starCountRef = ref(db, "users/");
-    onValue(starCountRef, (snapshot) => {
-      const data = snapshot.val();
-      const newData = Object.keys(data).map((key) => ({
-        ...data[key],
-      }));
-      // console.log(newData, '------')
-      setdataParty(newData);
-    });
-  }, []);
+    if (run) {
+      getDataReaktime()
+    }
+  }, [run]);
 
   function drawerHis() {
-    setRun(false);
-    setPrevLocation([initialRegion]);
-    setDistanceTravel(0);
+    // setRun(false);
+    // setPrevLocation([initialRegion]);
+    // setDistanceTravel(0);
+    const avgSpd = calculateAvgSpeed();
+
+    console.log({
+      token,
+      id: data?.createHistory?.insertedId,
+      content: {
+        avgSpeed: avgSpd,
+        distance: distanceTravel,
+        time: timer,
+        trackLine: prevLocation,
+      },
+    });
+    if (distanceTravel > 0 && avgSpd > 0 && timer > 0) {
+      setRun(false);
+      setPrevLocation([initialRegion]);
+      setDistanceTravel(0);
+      updateHistory({
+        variables: {
+          headers: {
+            access_token: token,
+          },
+          updateHistoryId: data?.createHistory?.insertedId,
+          content: {
+            avgSpeed: Math.round(avgSpd * 100) / 100,
+            distance: Math.round(distanceTravel),
+            time: timer,
+            trackLine: prevLocation,
+          },
+        },
+      });
+    } else {
+      alert("Kamu harus bergerak untuk menyimpan history!");
+    }
   }
+
+  const [createHistory, { data, loading, error }] = useMutation(CREATE_HISTORY, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+    },
+  });
+
+  const [updateHistory, { data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_HISTORY);
 
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -212,6 +304,7 @@ export default function CyclingPage_Party() {
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       console.log(distance);
       if (distance > 10) {
+        setAvgSpeed([...avgSpeed, location.coords.speed]);
         setPrevLocation([...prevLocation, initialRegion]);
         const distancePls = distanceTravel + distance;
         const distanceResult = Math.round(distancePls * 100) / 100;
@@ -237,22 +330,18 @@ export default function CyclingPage_Party() {
     }
   };
 
+  function calculateAvgSpeed() {
+    return avgSpeed.reduce((a, b) => a + b, 0) / avgSpeed.length;
+  }
+
   useEffect(() => {
+    cekToken()
     getLocation();
     getLocation();
     console.log("jalan");
-    setOrigin({
-      latitude: -7.2685914,
-      longitude: 112.746842,
-      longitudeDelta: 0.005,
-      latitudeDelta: 0.005
-    })
-    setDestination({
-      latitude: -7.391538991614165,
-      longitude: 112.69554779620968,
-      longitudeDelta: 0.005,
-      latitudeDelta: 0.005
-    })
+    setOrigin(originEvent)
+    setDestination(destinationEvent)
+    setShowDirections(true)
   }, []);
 
   useEffect(() => {
@@ -272,6 +361,8 @@ export default function CyclingPage_Party() {
 
   function startHandler() {
     setRun(true);
+    createHistory();
+
   }
 
   useEffect(() => {
@@ -316,7 +407,7 @@ export default function CyclingPage_Party() {
           </Marker>)}
           {showDirections && origin && destination && (
             <MapViewDirections
-              origin={initialRegion}
+              origin={run ? initialRegion : origin}
               destination={destination}
               apikey={GOOGLE_API_KEY}
               strokeColor="#6644ff"
@@ -349,7 +440,7 @@ export default function CyclingPage_Party() {
             </>
           )}
           {dataParty.map((el, i) => {
-            if (el.username !== first) {
+            if (el.username !== username) {
               return (
                 <Marker
                   key={i}

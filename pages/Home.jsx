@@ -35,36 +35,38 @@ function HomePage({ navigation }) {
         getHistories(headers: $getHistoriesHeaders2) {
           avgSpeed
           distance
+          startDate
+          endDate
         }
       }
     `
 
-      try {
-        const client = new ApolloClient({
-          uri: "http://18.140.54.54:3000/",
-          cache: new InMemoryCache(),
-        });
-        
-        const { data } = await client.query({
-          query: QUERY_GET_HOME,
-          variables: {
-            headers: {
-              access_token: await cekToken(),
-            },
-            getHistoriesHeaders2: {
-              access_token: await cekToken()
-            },
-          },
-        });
-        // console.log(lastData , "INI INDEX TERAKHIR");
-        // console.log(data.getHistories.length - 1.distance, "DAARI HOME<><><><><><<><>><><><");
-        console.log(data.getHistories[data.getHistories.length - 1].distance, "DAARI HOME<><><><><><<><>><><><");
+    try {
+      const client = new ApolloClient({
+        uri: "http://18.140.54.54:3000/",
+        cache: new InMemoryCache(),
+      });
 
-        setHomestats(data)
-      } catch (error) {
-        console.log(error)
-        Alert.alert('Error Render Home , please check your Connection')
-      }
+      const { data } = await client.query({
+        query: QUERY_GET_HOME,
+        variables: {
+          headers: {
+            access_token: await cekToken(),
+          },
+          getHistoriesHeaders2: {
+            access_token: await cekToken()
+          },
+        },
+      });
+      // console.log(lastData , "INI INDEX TERAKHIR");
+      // console.log(data.getHistories.length - 1.distance, "DAARI HOME<><><><><><<><>><><><");
+      console.log(data.getHistories[data.getHistories.length - 1].distance, "DAARI HOME<><><><><><<><>><><><");
+
+      setHomestats(data)
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Error Render Home , please check your Connection')
+    }
 
   }
   const cekToken = async () => {
@@ -75,7 +77,7 @@ function HomePage({ navigation }) {
 
   useEffect(() => {
     getDetailUser()
-  }, [] )
+  }, [])
 
   return (
     <View style={styles.AndroidSafeArea}>
@@ -135,19 +137,19 @@ function HomePage({ navigation }) {
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Distance</Text>
-              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.distance} m</Text>
+              <Text style={styles.DataHistory}>{(homestats?.getHistories[homestats.getHistories.length - 1]?.distance) / 1000} Km</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Speed</Text>
-              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.avgSpeed} Km/H</Text>
+              <Text style={styles.DataHistory}>{(homestats?.getHistories[homestats.getHistories.length - 1]?.avgSpeed) * 3.6} Km/H</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Time</Text>
-              <Text style={styles.DataHistory}>387 wH</Text>
+              <Text style={styles.DataHistory}>{Math.round((new Date(homestats?.getHistories[homestats.getHistories.length - 1]?.endDate) - new Date(homestats?.getHistories[homestats.getHistories.length - 1]?.startDate)) / 1000 / 36) / 100} Hrs</Text>
             </View>
           </View>
         </View>

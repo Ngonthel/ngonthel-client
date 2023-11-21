@@ -35,6 +35,14 @@ const GET_EVENT_DETAIL = gql`
         longtitude
         latitude
       }
+    },
+    getUserDetail(headers: $headers) {
+      user {
+        _id
+      }
+      profile {
+        username
+      }
     }
   }
 `;
@@ -108,6 +116,7 @@ export default function DetailEvent({ navigation }) {
     longitudeDelta: LONGITUDE_DELTA,
   };
   console.log(origin, destination)
+
   return (
     <View style={styles.AndroidSafeArea}>
       <MapView
@@ -141,12 +150,19 @@ export default function DetailEvent({ navigation }) {
           {data?.getEventDetail?.name}
         </Text>
         <Text style={styles.Date}>{formatDate()}</Text>
-        <TouchableOpacity style={styles.TouchableOpacity}>
+        <TouchableOpacity style={styles.TouchableOpacity} onPress={() => navigation.navigate("CyclingParty", {
+          eventCode: data?.getEventDetail?.eventCode,
+          username: data?.getUserDetail?.profile?.username,
+          origin: origin,
+          destination: destination
+        })}>
           <Text style={styles.TextButton}>Join Event</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.TouchableOpacityEnd}>
-          <Text style={styles.TextEndEvent}>End Event</Text>
-        </TouchableOpacity>
+        {data?.getEventDetail.createBy === data?.getUserDetail?.user?._id && (
+          <TouchableOpacity style={styles.TouchableOpacityEnd}>
+            <Text style={styles.TextEndEvent}>End Event</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
