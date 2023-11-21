@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 
-export default function Cardleaderboard({ title, index }) {
+export default function Cardleaderboard({ data, index }) {
   let medalColor = "transparent"; 
   if (index === 0) {
     medalColor = "#FFD700"
@@ -10,6 +10,7 @@ export default function Cardleaderboard({ title, index }) {
   } else if (index === 2) {
     medalColor = "#964B00"
   }
+  // console.log(data,"<><><<<<<<<<<<<>>>>>>>>>>>>>>");
   return (
     <View style={styles.card}>
       <Text
@@ -25,8 +26,8 @@ export default function Cardleaderboard({ title, index }) {
         <Image source={require("../assets/default-person.jpg")} style={styles.avatar} />
       </View>
       <View style={{ alignSelf: "center" }}>
-        <Text style={{ fontSize: 20, fontWeight: "600" }}>Agus Bensin</Text>
-        <Text>1000 points</Text>
+        <Text style={{ fontSize: 20, fontWeight: "600" }}>{data.name}</Text>
+        <Text>{data.totalPoint} points</Text>
       </View>
       <View style={{ alignSelf: "center" }}>
       <FontAwesome5 name="medal" size={24} color={medalColor} />
