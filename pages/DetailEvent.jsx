@@ -35,7 +35,12 @@ const GET_EVENT_DETAIL = gql`
         longtitude
         latitude
       }
+    },
+    getUserDetail(headers: $headers) {
+    user {
+      _id
     }
+  }
   }
 `;
 
@@ -144,9 +149,11 @@ export default function DetailEvent({ navigation }) {
         <TouchableOpacity style={styles.TouchableOpacity}>
           <Text style={styles.TextButton}>Join Event</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.TouchableOpacityEnd}>
-          <Text style={styles.TextEndEvent}>End Event</Text>
-        </TouchableOpacity>
+        {data?.getEventDetail.createBy === data?.getUserDetail._id && (
+          <TouchableOpacity style={styles.TouchableOpacityEnd}>
+            <Text style={styles.TextEndEvent}>End Event</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

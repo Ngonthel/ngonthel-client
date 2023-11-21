@@ -19,9 +19,34 @@ import * as Location from "expo-location";
 import { Platform } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
+const { width, height } = Dimensions.get("window")
+const ASPECT_RATIO = width / height
+const LATITUDE_DELTA = 0.02
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO
 
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
+  const mapRef = useRef()
+  const markerRef = useRef()
+
+  const onCenter = () => {
+    mapRef.current.animateToRegion({
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA
+    })
+  }
+  const animate = (latitude, longitude) => {
+    const newCoordinate = { latitude, longitude };
+    if (Platform.OS == 'android') {
+      if (markerRef.current) {
+        markerRef.current.animateMarkerToCoordinate(newCoordinate, 7000);
+      }
+    } else {
+      initialRegion.timing(newCoordinate).start();
+    }
+  }
 
   const handleButtonClick = () => {
     if (buttonText === "Start") {
@@ -169,6 +194,7 @@ export default function CyclingPage() {
       {/* </View> */}
       {initialRegion && (
         <MapView
+          ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
@@ -209,7 +235,7 @@ export default function CyclingPage() {
 
       <View className="shadow-2xl" style={styles.ButtonContainer}>
         <TouchableOpacity
-          onPress={() => setfollow(true)}
+          onPress={() => onCenter()}
         >
           <MaterialIcons
             style={{
@@ -265,7 +291,7 @@ export default function CyclingPage() {
     </View>
   );
 }
-const { width, height } = Dimensions.get("window");
+
 const isAndroid = Platform.OS === "android";
 const styles = StyleSheet.create({
   AndroidSafeArea: {
