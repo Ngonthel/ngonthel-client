@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   TouchableOpacity: {
     borderRadius: 10,
     width: "30%",
-    height: 25,
+    height: 30,
     backgroundColor: "#FFC329",
     alignItems: "center",
     justifyContent: "center",
@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
   TextButton: {
     fontSize: 14,
     color: "white",
+    fontWeight: 'bold'
   },
   map: {
     width: "100%",

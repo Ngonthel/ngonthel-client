@@ -6,7 +6,7 @@ import {
   Platform,
   FlatList,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Tab, TabView } from "@rneui/themed";
@@ -19,32 +19,32 @@ import {
   gql,
 } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useNavigation } from "@react-navigation/native";
 const GET_EVENTS = gql`
   query GetEvents($headers: Headers!, $filter: String) {
-  getEvents(headers: $headers, filter: $filter) {
-    _id
-    name
-    eventCode
-    eventDate
-    createdBy
-    isActive
-    from {
-      altitude
-      longtitude
-      latitude
-    }
-    dest {
-      altitude
-      longtitude
-      latitude
+    getEvents(headers: $headers, filter: $filter) {
+      _id
+      name
+      eventCode
+      eventDate
+      createdBy
+      isActive
+      from {
+        altitude
+        longtitude
+        latitude
+      }
+      dest {
+        altitude
+        longtitude
+        latitude
+      }
     }
   }
-}
 `;
 export default function Event() {
   const [token, setToken] = useState("");
-
+  const navigation = useNavigation()
   useEffect(() => {
     cekToken();
   }, []);
@@ -59,7 +59,7 @@ export default function Event() {
       headers: {
         access_token: token,
       },
-      filter: "active"
+      filter: "active",
     },
   });
 
@@ -135,18 +135,18 @@ export default function Event() {
         </TabView.Item>
         <TabView.Item style={styles.tabViewItem}>
           <Text h1>Favorite</Text>
-         
         </TabView.Item>
         <TabView.Item style={styles.tabViewItem}>
           {/* <Text h1>Your Event</Text> */}
-          <View>
-            <Text></Text>
+          <View
+          >
+            <Text style={styles.Title}>You don't have an event yet.</Text>
+            <View style={styles.ButtonContainer}>
+            <TouchableOpacity style={styles.TouchableOpacity} onPress={() => navigation.navigate('Create Event')}>
+              <Text style={styles.TextButton}>Create Event</Text>
+            </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity style={styles.TouchableOpacity}>
-            <Text style={styles.TextButton}>
-              Create Event
-            </Text>
-          </TouchableOpacity>
         </TabView.Item>
       </TabView>
     </View>
@@ -205,18 +205,17 @@ const styles = StyleSheet.create({
   },
   tabViewItem: {
     width: "100%",
-    // justifyContent: 'center',
-    alignContent: "center",
+    justifyContent: "center",
+    // alignContent: "center",
     alignItems: "center",
     // flex: 1,
-    // backgroundColor: 'blue',
     padding: 5,
     // marginLeft: 10
   },
   TouchableOpacity: {
     borderRadius: 10,
-    width: "30%",
-    height: 25,
+    width: "50%",
+    height: 40,
     backgroundColor: "#FFC329",
     alignItems: "center",
     justifyContent: "center",
@@ -224,5 +223,18 @@ const styles = StyleSheet.create({
   TextButton: {
     fontSize: 14,
     color: "white",
+    fontWeight: 'bold'
+  },
+  Title: {
+    fontSize: Platform.OS === "ios" ? 18 : 14,
+    // marginTop: Platform.OS === "ios" ? 15 : 10,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#293038",
+    marginTop: 1,
+  },
+  ButtonContainer: {
+    alignItems: "center",
+    marginTop: 10,
   },
 });
