@@ -41,6 +41,7 @@ export default function CyclingPage() {
   const [locFirst, setLocFirst] = useState(null);
   const [timer, setTimer] = useState(0);
   const [follow, setfollow] = useState(true);
+  const [avgSpeed, setAvgSpeed] = useState([])
 
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -62,12 +63,17 @@ export default function CyclingPage() {
   ]);
   //test animasi
 
+  function calculateAvgSpeed() {
+    return avgSpeed.reduce((a, b) => a + b, 0) / avgSpeed.length
+  }
   //Funcion
 
   function drawerHis() {
     setRun(false);
     setPrevLocation([initialRegion]);
     setDistanceTravel(0);
+    const avgSpd = calculateAvgSpeed()
+    console.log(avgSpd)
   }
 
   const getLocation = async () => {
@@ -93,6 +99,7 @@ export default function CyclingPage() {
     if (run) {
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       if (distance > 10) {
+        setAvgSpeed([...avgSpeed, location.coords.speed])
         setPrevLocation([...prevLocation, initialRegion]);
         const distancePls = distanceTravel + distance;
         const distanceResult = Math.round(distancePls * 100) / 100;
