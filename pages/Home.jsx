@@ -29,7 +29,7 @@ function HomePage({ navigation }) {
             >
               <FontAwesome5 name="coins" size={11} color="#ffc329" />
             </View>
-            <Text className="text-lg text-[#696e74]" style={styles.DataHistory}>
+            <Text className="text-lg text-[#696e74]" style={styles.Coin}>
               12
             </Text>
           </View>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   TextHi: {
-    fontSize: Platform.OS === "ios" ? 14 : 10,
+    fontSize: Platform.OS === "ios" ? 16 : 12,
     marginTop: 1,
     color: "#696e74",
   },
@@ -245,6 +245,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  Coin: {
+    fontSize: Platform.OS === "ios" ? 16 : 12,
+    marginTop: 1,
+    color: "#696e74",
+  }
 });
 
 export default HomePage;
