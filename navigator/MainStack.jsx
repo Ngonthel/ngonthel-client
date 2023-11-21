@@ -12,7 +12,8 @@ export default function MainStack() {
             <Stack.Screen name="home" component={Home} options={{ headerShown: false }} />
             <Stack.Screen name="login" component={Login} options={{ headerShown: false }} />
             <Stack.Screen name="History" component={History} />
-            <Stack.Screen name="Cycling" component={CyclingPage_Party} />
+            <Stack.Screen name="CyclingParty" component={CyclingPage_Party} />
+            <Stack.Screen name="Cycling" component={CyclingPage} />
         </Stack.Navigator>
     )
 

@@ -7,17 +7,83 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+import {
+  ApolloClient,
+  InMemoryCache,
+  useQuery,
+  ApolloProvider,
+  gql,
+} from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+
 function HomePage({ navigation }) {
+  const [homestats, setHomestats] = useState(null)
+  const getDetailUser = async () => {
+    const QUERY_GET_HOME = gql`
+      query Profile($headers: Headers!, $getHistoriesHeaders2: Headers!) {
+        getUserDetail(headers: $headers) {
+          profile {
+            username
+            totalPoint
+          }
+        }
+        getHistories(headers: $getHistoriesHeaders2) {
+          avgSpeed
+          distance
+        }
+      }
+    `
+
+      try {
+        const client = new ApolloClient({
+          uri: "http://18.140.54.54:3000/",
+          cache: new InMemoryCache(),
+        });
+        
+        const { data } = await client.query({
+          query: QUERY_GET_HOME,
+          variables: {
+            headers: {
+              access_token: await cekToken(),
+            },
+            getHistoriesHeaders2: {
+              access_token: await cekToken()
+            },
+          },
+        });
+        // console.log(lastData , "INI INDEX TERAKHIR");
+        // console.log(data.getHistories.length - 1.distance, "DAARI HOME<><><><><><<><>><><><");
+        console.log(data.getHistories[data.getHistories.length - 1].distance, "DAARI HOME<><><><><><<><>><><><");
+
+        setHomestats(data)
+      } catch (error) {
+        console.log(error)
+        Alert.alert('Error Render Home , please check your Connection')
+      }
+
+  }
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    return token;
+  };
+
+
+  useEffect(() => {
+    getDetailUser()
+  }, [] )
+
   return (
     <View style={styles.AndroidSafeArea}>
       {/* HI, USERNAME */}
       <View className="flex flex-row" style={{ marginTop: 20 }}>
         <View className="flex-1 items-left justify-center">
           <Text style={styles.TextHi}>
-            Hi, <Text className="font-bold text-[#293038]">[ Username ]</Text>
+            Hi, <Text className="font-bold text-[#293038] text-sm">[ {homestats?.getUserDetail?.profile.username} ]</Text>
           </Text>
           <View style={{ flexDirection: "row" }}>
             <View
@@ -30,7 +96,7 @@ function HomePage({ navigation }) {
               <FontAwesome5 name="coins" size={11} color="#ffc329" />
             </View>
             <Text className="text-lg text-[#696e74]" style={styles.DataHistory}>
-              12
+              {homestats?.getUserDetail?.profile.totalPoint}
             </Text>
           </View>
         </View>
@@ -69,13 +135,13 @@ function HomePage({ navigation }) {
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Distance</Text>
-              <Text style={styles.DataHistory}>50mil</Text>
+              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.distance} m</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Speed</Text>
-              <Text style={styles.DataHistory}>75 Km/H</Text>
+              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.avgSpeed} Km/H</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
@@ -109,7 +175,10 @@ function HomePage({ navigation }) {
                 with Gowez!
               </Text>
               <View style={styles.ButtonContainer}>
-                <TouchableOpacity style={styles.TouchableOpacity}  onPress={() => navigation.navigate("Cycling")}>
+                <TouchableOpacity
+                  style={styles.TouchableOpacity}
+                  onPress={() => navigation.navigate("Cycling")}
+                >
                   <Text style={styles.TextButton}>Go</Text>
                 </TouchableOpacity>
               </View>
@@ -214,7 +283,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   TextHi: {
-    fontSize: Platform.OS === "ios" ? 14 : 10,
+    fontSize: Platform.OS === "ios" ? 14 : 16,
     marginTop: 1,
     color: "#696e74",
   },
@@ -245,6 +314,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  Coin: {
+    fontSize: Platform.OS === "ios" ? 16 : 12,
+    marginTop: 1,
+    color: "#696e74",
+  }
 });
 
 export default HomePage;
