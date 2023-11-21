@@ -10,7 +10,7 @@ export default function MainStack(){
     return(
         <Stack.Navigator >
             <Stack.Screen  name="home" component={Home} options={{ headerShown: false }} />
-            {/* <Stack.Screen name="login" component={Login} options={{ headerShown: false }} /> */}
+            <Stack.Screen name="login" component={Login} options={{ headerShown: false }} />
             <Stack.Screen name="History" component={History} />
             <Stack.Screen name="Cycling" component={CyclingPage} />
         </Stack.Navigator>
