@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StyleSheet, StatusBar, TouchableOpacity, Image } from "react-native";
+import { View, Text, Dimensions, StyleSheet, Alert, StatusBar, TouchableOpacity, Image } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE, AnimatedRegion } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
 import haversine from "haversine";
@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/core";
 
 const CREATE_HISTORY = gql`
   mutation CreateHistory($headers: Headers!) {
@@ -36,7 +37,20 @@ export default function CyclingPage() {
       startHandler();
     } else {
       setButtonText("Start");
-      drawerHis();
+      // drawerHis();
+      Alert.alert(
+        "Confirmation",
+        "Are you sure you want to stop?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          { text: "OK", onPress: () => drawerHis() },
+        ],
+        { cancelable: false }
+      );
     }
   };
 
@@ -53,6 +67,8 @@ export default function CyclingPage() {
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+
+  const navigation = useNavigation();
 
   //test animasi
   const [prevLocation, setPrevLocation] = useState([
@@ -103,7 +119,7 @@ export default function CyclingPage() {
     if (distanceTravel > 0 && avgSpd > 0 && timer > 0) {
       setRun(false);
       setPrevLocation([initialRegion]);
-      setDistanceTravel(0);
+      // setDistanceTravel(0);
       updateHistory({
         variables: {
           headers: {
@@ -122,6 +138,20 @@ export default function CyclingPage() {
       alert("Kamu harus bergerak untuk menyimpan history!");
     }
   }
+
+  useEffect(() => {
+    console.log(updateData, "DATA ADA / GK ADA");
+    const avgSpd = calculateAvgSpeed();
+    if (updateData) {
+      console.log(updateData, "DATA ADA");
+      navigation.navigate("Summary", {
+        point: updateData?.updateHistory?.point,
+        time: updateData?.updateHistory?.time,
+        distance: distanceTravel,
+        avgSpeed: avgSpd,
+      });
+    }
+  });
 
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();

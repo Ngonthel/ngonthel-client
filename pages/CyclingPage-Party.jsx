@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Modal
+  Modal,
 } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
@@ -16,16 +16,15 @@ import * as Location from "expo-location";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 import MapViewDirections from "react-native-maps-directions";
-import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
 import firebase from "firebase/compat/app";
 import { getDatabase, ref, set, onValue } from "firebase/database";
-import Bike from '../assets/personal-bike.svg'
-import Start from '../assets/starts-logo.svg'
-import { useRoute } from "@react-navigation/core";
+import Bike from "../assets/personal-bike.svg";
+import Start from "../assets/starts-logo.svg";
+import { useNavigation, useRoute } from "@react-navigation/core";
 import { useMutation, gql } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 
 const CREATE_HISTORY = gql`
   mutation CreateHistory($headers: Headers!) {
@@ -37,7 +36,11 @@ const CREATE_HISTORY = gql`
 `;
 
 const UPDATE_HISTORY = gql`
-  mutation UpdateHistory($updateHistoryId: ID!, $headers: Headers!, $content: UpdateData) {
+  mutation UpdateHistory(
+    $updateHistoryId: ID!
+    $headers: Headers!
+    $content: UpdateData
+  ) {
     updateHistory(id: $updateHistoryId, headers: $headers, content: $content) {
       acknowledged
       point
@@ -79,8 +82,13 @@ const GOOGLE_API_KEY = "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo";
 
 export default function CyclingPage_Party() {
   const [buttonText, setButtonText] = useState("Start");
-  const route = useRoute()
-  const { eventCode, username, origin: originEvent, destination: destinationEvent } = route.params
+  const route = useRoute();
+  const {
+    eventCode,
+    username,
+    origin: originEvent,
+    destination: destinationEvent,
+  } = route.params;
   // console.log(eventCode, username, originEvent, destinationEvent)
 
   const handleButtonClick = () => {
@@ -91,15 +99,15 @@ export default function CyclingPage_Party() {
       setButtonText("Start");
       // Menampilkan alert ketika tombol 'Stop' ditekan
       Alert.alert(
-        'Confirmation',
-        'Are you sure you want to stop?',
+        "Confirmation",
+        "Are you sure you want to stop?",
         [
           {
-            text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
-            style: 'cancel'
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
           },
-          { text: 'OK', onPress: () => drawerHis() }
+          { text: "OK", onPress: () => drawerHis() },
         ],
         { cancelable: false }
       );
@@ -114,7 +122,6 @@ export default function CyclingPage_Party() {
   const mapRef = useRef(null);
 
   const [avgSpeed, setAvgSpeed] = useState([0]);
-
 
   const [currentLocation, setCurrentLocation] = useState(null);
   const [initialRegion, setInitialRegion] = useState(null);
@@ -204,28 +211,30 @@ export default function CyclingPage_Party() {
 
   async function getDataReaktime() {
     try {
-      const starCountRef = ref(db, eventCode + "/");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    // if (run) {
+    //   // getDataReaktime()
+    // }
+    const starCountRef = ref(db, eventCode + "/");
+
+    try {
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
         const newData = Object.keys(data).map((key) => ({
           ...data[key],
         }));
-        console.log(newData, '------')
-        if (data.length > 0) {
-
-        }
+        console.log(newData, "------");
         setdataParty(newData);
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
-
-  useEffect(() => {
-    if (run) {
-      getDataReaktime()
-    }
-  }, [run]);
+  }, []);
 
   function drawerHis() {
     // setRun(false);
@@ -246,7 +255,7 @@ export default function CyclingPage_Party() {
     if (distanceTravel > 0 && avgSpd > 0 && timer > 0) {
       setRun(false);
       setPrevLocation([initialRegion]);
-      setDistanceTravel(0);
+      // setDistanceTravel(0);
       updateHistory({
         variables: {
           headers: {
@@ -262,19 +271,39 @@ export default function CyclingPage_Party() {
         },
       });
     } else {
-      alert("Kamu harus bergerak untuk menyimpan history!");
+      alert("You have to move to save the history");
     }
   }
 
-  const [createHistory, { data, loading, error }] = useMutation(CREATE_HISTORY, {
-    variables: {
-      headers: {
-        access_token: token,
-      },
-    },
+  useEffect(() => {
+    console.log(updateData, "DATA ADA / GK ADA");
+    const avgSpd = calculateAvgSpeed();
+    if (updateData) {
+      console.log(updateData, "DATA ADA");
+      navigation.navigate("Summary", {
+        point: updateData?.updateHistory?.point,
+        time: updateData?.updateHistory?.time,
+        distance: distanceTravel,
+        avgSpeed: avgSpd,
+      });
+    }
   });
 
-  const [updateHistory, { data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_HISTORY);
+  const [createHistory, { data, loading, error }] = useMutation(
+    CREATE_HISTORY,
+    {
+      variables: {
+        headers: {
+          access_token: token,
+        },
+      },
+    }
+  );
+
+  const [
+    updateHistory,
+    { data: updateData, loading: updateLoading, error: updateError },
+  ] = useMutation(UPDATE_HISTORY);
 
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -335,13 +364,13 @@ export default function CyclingPage_Party() {
   }
 
   useEffect(() => {
-    cekToken()
+    cekToken();
     getLocation();
     getLocation();
     console.log("jalan");
-    setOrigin(originEvent)
-    setDestination(destinationEvent)
-    setShowDirections(true)
+    setOrigin(originEvent);
+    setDestination(destinationEvent);
+    setShowDirections(true);
   }, []);
 
   useEffect(() => {
@@ -356,13 +385,9 @@ export default function CyclingPage_Party() {
     return () => clearInterval(time);
   });
 
-
-
-
   function startHandler() {
     setRun(true);
     createHistory();
-
   }
 
   useEffect(() => {
@@ -382,6 +407,8 @@ export default function CyclingPage_Party() {
     setfollow(false);
   }
 
+  const navigation = useNavigation();
+
   return (
     <View style={styles.AndroidSafeArea}>
       {/* <View style={styles.CardShadow}> */}
@@ -397,14 +424,18 @@ export default function CyclingPage_Party() {
           onTouchEnd={() => followHadler(false)}
           loadingEnabled
         >
-          {origin && (<Marker coordinate={origin} >
-            {/* <Image source={require('../assets/start-logos.png')} /> */}
-            <Start />
-          </Marker>)}
-          {destination && (<Marker coordinate={destination} >
-            {/* <FontAwesome name="flag-checkered" size={30} color="black" /> */}
-            <Image source={require('../assets/finish-logo.png')} />
-          </Marker>)}
+          {origin && (
+            <Marker coordinate={origin}>
+              {/* <Image source={require('../assets/start-logos.png')} /> */}
+              <Start />
+            </Marker>
+          )}
+          {destination && (
+            <Marker coordinate={destination}>
+              {/* <FontAwesome name="flag-checkered" size={30} color="black" /> */}
+              <Image source={require("../assets/finish-logo.png")} />
+            </Marker>
+          )}
           {showDirections && origin && destination && (
             <MapViewDirections
               origin={run ? initialRegion : origin}
@@ -436,7 +467,7 @@ export default function CyclingPage_Party() {
                   resizeMode="contain"
                 />
               </Marker.Animated>
-              <Polyline coordinates={prevLocation} strokeWidth={3} />
+              {/* <Polyline coordinates={prevLocation} strokeWidth={3}  /> */}
             </>
           )}
           {dataParty.map((el, i) => {
@@ -444,11 +475,16 @@ export default function CyclingPage_Party() {
               return (
                 <Marker
                   key={i}
-                  coordinate={{ latitude: el.latitude, longitude: el.longitude }}
+                  coordinate={{
+                    latitude: el.latitude,
+                    longitude: el.longitude,
+                  }}
                   title={el.username}
                 >
                   <View style={styles.priceTag}>
-                    <Text style={{ fontWeight: '500', fontSize: 12, elevation: 10 }}>
+                    <Text
+                      style={{ fontWeight: "500", fontSize: 12, elevation: 10 }}
+                    >
                       {el.username}
                     </Text>
                   </View>
@@ -461,22 +497,24 @@ export default function CyclingPage_Party() {
       )}
 
       <View className="shadow-2xl" style={styles.ButtonContainer}>
-        <TouchableOpacity
-          onPress={() => setfollow(true)}
-        >
+        <TouchableOpacity onPress={() => setfollow(true)}>
           <MaterialIcons
             style={{
               position: "absolute",
               padding: 8,
-              backgroundColor: 'white',
+              backgroundColor: "white",
               borderRadius: 4,
               // zIndex: 99,
-              top: -1 / 14 * height,
+              top: (-1 / 14) * height,
               right: 0,
               // width: 1 / 2 * width,
               // height: 1/3,
-              elevation: 5
-            }} name="my-location" size={24} color="#1640D6" />
+              elevation: 5,
+            }}
+            name="my-location"
+            size={24}
+            color="#1640D6"
+          />
         </TouchableOpacity>
         <View style={styles.RowRecentHistory}>
           <View style={styles.DataShadow}>
@@ -509,7 +547,10 @@ export default function CyclingPage_Party() {
         </View>
         <TouchableOpacity
           // style={styles.TouchableOpacity}
-          style={[styles.TouchableOpacity, { backgroundColor: run ? 'red' : "#FFC329" }]}
+          style={[
+            styles.TouchableOpacity,
+            { backgroundColor: run ? "red" : "#FFC329" },
+          ]}
           onPress={handleButtonClick}
         >
           <Text style={styles.TextButton}>{buttonText}</Text>
@@ -548,28 +589,28 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 2,
-        backgroundColor: "green"
+        backgroundColor: "green",
       },
     }),
     padding: Platform.OS === "ios" ? 8 : 7.5,
-  }, priceTag: {
+  },
+  priceTag: {
     backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
     elevation: 5,
-
   },
   ButtonContainer: {
-    position: 'absolute',
+    position: "absolute",
     alignSelf: "center",
     justifyContent: "center",
     marginTop: 10,
     padding: 10,
     width: 0.95 * width,
-    bottom: 1 / 7 * height,
+    bottom: (1 / 7) * height,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
 
     // borderColor: '#FFC329',
     // borderWidth: 1
@@ -594,12 +635,11 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
-
   },
   TextButton: {
     fontSize: 20,
     color: "white",
-    alignSelf: 'center'
+    alignSelf: "center",
   },
   RowRecentHistory: {
     flexDirection: "row",
@@ -638,4 +678,3 @@ const styles = StyleSheet.create({
     color: "#696e74",
   },
 });
-

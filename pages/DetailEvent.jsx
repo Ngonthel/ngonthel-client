@@ -86,7 +86,11 @@ export default function DetailEvent({ navigation }) {
     },
   });
 
-  console.log(data)
+  // console.log(data)
+
+
+// console.log(data?.getEventDetail.createdBy , "<>><><><>");
+// console.log(data?.getUserDetail?.user?._id , "<<<<<<<<<<<<<<>><><><>>>>>>>>>>>>>>");
 
 
   const edgePaddingValue = 50;
@@ -158,7 +162,7 @@ export default function DetailEvent({ navigation }) {
         })}>
           <Text style={styles.TextButton}>Join Event</Text>
         </TouchableOpacity>
-        {data?.getEventDetail.createBy === data?.getUserDetail?.user?._id && (
+        {data?.getEventDetail.createdBy === data?.getUserDetail?.user?._id && (
           <TouchableOpacity style={styles.TouchableOpacityEnd}>
             <Text style={styles.TextEndEvent}>End Event</Text>
           </TouchableOpacity>

@@ -7,6 +7,7 @@ import DetailEvent from "../pages/DetailEvent";
 import CyclingPage from "../pages/CyclingPage";
 import MapV3 from "../pages/CreateEvent";
 import CyclingPage_Party from "../pages/CyclingPage-Party";
+import Summary from "../pages/Summary";
 
 export default function MainStack() {
     const Stack = createNativeStackNavigator()
@@ -17,6 +18,8 @@ export default function MainStack() {
             <Stack.Screen name="History" component={History} />
             <Stack.Screen name="CyclingParty" component={CyclingPage_Party} />
             <Stack.Screen name="Cycling" component={CyclingPage} />
+            <Stack.Screen name="Summary" component={Summary} options={{ headerShown: false }}/>
+
        
         </Stack.Navigator>
     )

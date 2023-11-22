@@ -4,9 +4,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 export default function CardHistory({ item }) {
   const currentDateTime = new Date();
   const formattedDate = `${currentDateTime.toDateString()}`;
+  // console.log(item, "TANDAIN NGGABUNG")
 
-  const startDate = new Date(item.startTime);
-  const endDate = new Date(item.endTime);
+  console.log(item, "TIME");
+  const startDate = new Date(item.startDate);
+  const endDate = new Date(item.endDate);
 
   // Format waktu
   const formattedStartTime = startDate.toLocaleTimeString("en-US", {
@@ -22,7 +24,6 @@ export default function CardHistory({ item }) {
     <>
       <Text style={styles.SubTitle}>{formattedDate}</Text>
       <View style={styles.CardShadow}>
-
         <View style={styles.ContainerCard}>
           <View style={{ alignItems: "center", justifyContent: "center" }}>
             <MaterialCommunityIcons
@@ -33,7 +34,7 @@ export default function CardHistory({ item }) {
           </View>
           <View>
             <Text style={styles.TitleHistory}>Points</Text>
-            <Text style={styles.DataHistory}>0 Point</Text>
+            <Text style={styles.DataHistory}>{item?.point} Point</Text>
           </View>
         </View>
         <View style={styles.ContainerCard}>
@@ -46,7 +47,7 @@ export default function CardHistory({ item }) {
           </View>
           <View>
             <Text style={styles.TitleHistory}>Distance</Text>
-            <Text style={styles.DataHistory}>1 Km</Text>
+            <Text style={styles.DataHistory}>{item?.distance} m</Text>
           </View>
         </View>
         <View style={styles.ContainerCard}>
@@ -62,7 +63,9 @@ export default function CardHistory({ item }) {
           </View>
           <View>
             <Text style={styles.TitleHistory}>Average Speed</Text>
-            <Text style={styles.DataHistory}>1 Km</Text>
+            <Text style={styles.DataHistory}>
+              {(item?.avgSpeed * 3.6).toFixed(2)} km/H
+            </Text>
           </View>
         </View>
 
@@ -108,7 +111,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
     borderRadius: 10,
-    width: "100%",
+    width: "98%",
+    alignSelf: "center",
     // height: "50%",
     ...Platform.select({
       ios: {

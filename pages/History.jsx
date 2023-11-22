@@ -17,6 +17,38 @@ import {
   StackedBarChart,
 } from "react-native-chart-kit";
 import CardHistory from "../components/CardHistory";
+import { gql, useQuery } from "@apollo/client";
+import { useEffect } from "react";
+import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const GET_HISTORIES = gql`
+  query History($headers: Headers!) {
+    getHistories(headers: $headers) {
+      _id
+      avgSpeed
+      distance
+      startDate
+      endDate
+      point
+    }
+  }
+`;
+
+const GET_PROFILE = gql`
+  query Profile($headers: Headers!) {
+    getUserDetail(headers: $headers) {
+      profile {
+        totalPoint
+        totalTime
+        totalDistance
+      }
+    }
+  }
+`;
+
+const { height, width } = Dimensions.get("window");
+
 export default function History() {
   const DATA = [
     {
@@ -61,120 +93,169 @@ export default function History() {
     </View>
   );
 
+  const [token, setToken] = useState("");
+
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setToken(token);
+  };
+
+  useEffect(() => {
+    cekToken();
+  }, []);
+
+  const { data, loading, error } = useQuery(GET_HISTORIES, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+    },
+  });
+
+  const {
+    data: profileData,
+    loading: profileLoading,
+    error: profileError,
+  } = useQuery(GET_PROFILE, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+    },
+  });
+
+  // const [dataToShowInChart, setDataToShowInChart] = useState([]);
+
+  // useEffect(() => {
+  //   if(data?.getHistories?.length) {
+  //     setDataToShowInChart(data?.getHistories.splice(data?.getHistories?.length-1, data?.getHistories?.length-8))
+  //   }
+  // }, [data])
+
+  // console.log(data, error, "DATA");
+  // console.log(token, "TOKEN");
+  // console.log(profileData, profileError, "PROFILE DATA");
+  console.log(data?.getHistories[0]?.distance, "APA GITU");
   return (
     <View style={styles.AndroidSafeArea}>
-      {/* History Lates */}
-      {/* <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <Text
-          className="font-bold text-[#293038]"
-          style={{
-            fontSize: 24,
-            marginTop: Platform.OS === "ios" ? 15 : 10,
-          }}
-        >
-          History Latest
-        </Text>
-      </View> */}
-      <View style={styles.ContainerHistoryLatest}>
-        <View style={styles.CardShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Distance</Text>
-            <Text style={styles.DataHistory}>75 Km/H</Text>
-          </View>
-        </View>
-        <View style={styles.CardShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Speed</Text>
-            <Text style={styles.DataHistory}>75 Km/H</Text>
-          </View>
-        </View>
-        <View style={styles.CardShadow}>
-          <View>
-            <Text style={styles.TitleHistory}>Time</Text>
-            <Text style={styles.DataHistory}>75 Km/H</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* CHART */}
-      <View
-        style={styles.ChartShadow}
-      >
-        <LineChart
-          data={{
-            labels: ["Jan", "Feb", "March", "April", "May", "June", "July"],
-            datasets: [
-              {
-                data: [
-                  Math.random() * 1,
-                  Math.random() * 1,
-                  Math.random() * 1,
-                  Math.random() * 1,
-                  Math.random() * 1,
-                  Math.random() * 1,
-                  Math.random() * 1,
-                ],
-              },
-            ],
-          }}
-          width={Dimensions.get("window").width - 40} // from react-native
-          height={200}
-          // yAxisLabel="$"
-          yAxisSuffix="Km"
-          yAxisInterval={1} // optional, defaults to 1
-          chartConfig={{
-            // backgroundColor: "black",
-            backgroundGradientFrom: "white",
-            backgroundGradientTo: "white",
-            decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgb(252, 193, 41)`,
-            labelColor: (opacity = 1) => `rgb(21, 20, 27)`,
-            style: {
-              borderRadius: 16,
-              backgroundColor: "red",
-            },
-            propsForDots: {
-              r: "5",
-              strokeWidth: "2",
-              stroke: "#FFC329",
-            },
-          }}
-          bezier
-          style={{
-            marginVertical: 8,
-            // borderRadius: 16,
-          }}
-        />
-      </View>
-
-      {/* My History */}
-      <Text
-        className="font-bold text-[#293038]"
-        style={{
-          fontSize: 24,
-          marginTop: Platform.OS === "ios" ? 15 : 10,
-        }}
-      >
-        My History
-      </Text>
       <FlatList
-        data={DATA}
+        data={data?.getHistories}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => <CardHistory item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
+        ListFooterComponent={<View className="h-5"></View>}
+        ListHeaderComponent={
+          <View className="pt-3">
+            <View style={styles.ContainerHistoryLatest}>
+              <View style={styles.CardShadow}>
+                <View>
+                  <Text style={styles.TitleHistory}>Total Distance</Text>
+                  <Text style={styles.DataHistory}>
+                    {(
+                      Number(
+                        profileData?.getUserDetail?.profile?.totalDistance
+                      ) / 1000
+                    ).toFixed(2)}{" "}
+                    km
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.CardShadow}>
+                <View>
+                  <Text style={styles.TitleHistory}>Total Point</Text>
+                  <Text style={styles.DataHistory}>
+                    {profileData?.getUserDetail?.profile?.totalPoint}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.CardShadow}>
+                <View>
+                  <Text style={styles.TitleHistory}>Total Time</Text>
+                  <Text style={styles.DataHistory}>
+                    {profileData?.getUserDetail?.profile?.totalPoint}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/* CHART */}
+            <View style={styles.ChartShadow}>
+              {data?.getHistories?.length && (
+                <LineChart
+                  data={{
+                    labels: ["1", "2", "3", "4", "5", "6", "7"],
+                    datasets: [
+                      {
+                        data: [
+                          data?.getHistories.at(-1).distance / 1000 || 0,
+                          data?.getHistories.at(-2).distance / 1000 || 0,
+                          data?.getHistories.at(-3).distance / 1000 || 0,
+                          data?.getHistories.at(-4).distance / 1000 || 0,
+                          data?.getHistories.at(-5).distance / 1000 || 0,
+                          data?.getHistories.at(-6).distance / 1000 || 0,
+                          data?.getHistories.at(-7).distance / 1000 || 0,
+                        ],
+                      },
+                    ],
+                  }}
+                  width={(9 / 10) * width} // from react-native
+                  height={200}
+                  yAxisSuffix=" m"
+                  yAxisInterval={1} // optional, defaults to 1
+                  chartConfig={{
+                    backgroundGradientFrom: "white",
+                    backgroundGradientTo: "white",
+                    decimalPlaces: 2, // optional, defaults to 2dp
+                    color: (opacity = 1) => `rgb(252, 193, 41)`,
+                    labelColor: (opacity = 1) => `rgb(21, 20, 27)`,
+                    style: {
+                      borderRadius: 16,
+                      backgroundColor: "red",
+                    },
+                    propsForDots: {
+                      r: "5",
+                      strokeWidth: "2",
+                      stroke: "#FFC329",
+                    },
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                  }}
+                />
+              )}
+            </View>
+
+            {/* My History */}
+            <View>
+              <Text
+                className="font-bold text-[#293038]"
+                style={{
+                  fontSize: 24,
+                  marginTop: Platform.OS === "ios" ? 15 : 10,
+                }}
+              >
+                My History
+              </Text>
+            </View>
+          </View>
+        }
       />
     </View>
-    // </View>
   );
 }
 
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     flex: 1,
-    paddingTop:
-      Platform.OS === "android" || Platform.OS === "ios"
-        ? StatusBar.currentHeight
-        : 0,
+    alignItems: "center",
+    justifyContent: "center",
+    // paddingTop:
+    //   Platform.OS === "android" || Platform.OS === "ios"
+    //     ? StatusBar.currentHeight
+    //     : 0,
+    // marginHorizontal: 14,
+    // padding: 16,
     paddingHorizontal: 14,
     backgroundColor: "white",
   },
@@ -182,6 +263,7 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === "ios" ? 18 : 14,
     fontWeight: "bold",
     color: "#293038",
+    textAlign: "center",
   },
   DataHistory: {
     fontSize: Platform.OS === "ios" ? 14 : 10,
@@ -202,24 +284,28 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
-    padding: Platform.OS === "ios" ? 15 : 7.5,
+    // paddingVertical: Platform.OS === "ios" ? 15 : 15,
+    paddingHorizontal: Platform.OS === "ios" ? 15 : 7,
     alignItems: "center",
+    justifyContent: "center",
+    height: (1 / 10) * height,
+    marginHorizonal: 10,
   },
   ContainerHistoryLatest: {
     marginTop: 3,
     flexDirection: "row",
-    gap: 5,
+    gap: 10,
     alignItems: "center",
     justifyContent: "center",
     padding: 1,
   },
   ChartShadow: {
-    marginTop: 20,
+    marginTop: 10,
     justifyContent: "center",
     backgroundColor: "white",
     borderRadius: 10,
-    width: "100%",
-    // height: "50%",
+    width: "98%",
+    alignSelf: "center",
     ...Platform.select({
       ios: {
         shadowColor: "rgba(0, 0, 0, 0.2)",
@@ -231,5 +317,5 @@ const styles = StyleSheet.create({
       },
     }),
     padding: Platform.OS === "ios" ? 8 : 7.5,
-  }
+  },
 });
