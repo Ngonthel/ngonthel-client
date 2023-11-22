@@ -28,8 +28,14 @@ const UPDATE_HISTORY = gql`
   }
 `;
 
+const { width, height } = Dimensions.get("window");
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.02;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
 export default function CyclingPage() {
   const [buttonText, setButtonText] = useState("Start");
+  const mapRef = useRef()
 
   const handleButtonClick = () => {
     if (buttonText === "Start") {
@@ -153,6 +159,21 @@ export default function CyclingPage() {
     }
   });
 
+  const onCenter = (value) => {
+    if (value) {
+      setfollow(true)
+    }
+    if (currentLocation) {
+      mapRef.current.animateToRegion({
+        latitude: currentLocation.latitude - 0.004,
+        longitude: currentLocation.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA
+      })
+
+    }
+  }
+
   const getLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
@@ -171,9 +192,11 @@ export default function CyclingPage() {
       latitudeDelta: 0.005,
       longitudeDelta: 0.005,
     });
-    // console.log(location, "LOC");
 
     if (run) {
+      if (follow) {
+        onCenter()
+      }
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       if (distance > 10) {
         setAvgSpeed([...avgSpeed, location.coords.speed]);
@@ -244,14 +267,6 @@ export default function CyclingPage() {
     setSeconds(Math.floor(timer % 60));
   }, [timer]);
 
-  const [regionLocation, setRegionLocation] = useState();
-  function followHadler(value) {
-    if (value) {
-      setRegionLocation();
-    }
-    setfollow(false);
-  }
-
   return (
     <View style={styles.AndroidSafeArea}>
       {/* <View style={styles.CardShadow}> */}
@@ -262,9 +277,9 @@ export default function CyclingPage() {
           style={styles.map}
           provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
-          region={follow ? initialRegion : regionLocation}
-          onTouchEnd={() => followHadler(false)}
+          onTouchEnd={() => setfollow(false)}
           loadingEnabled
+          ref={mapRef}
         >
           {currentLocation && (
             <>
@@ -293,7 +308,7 @@ export default function CyclingPage() {
       )}
 
       <View className="shadow-2xl" style={styles.ButtonContainer}>
-        <TouchableOpacity onPress={() => setfollow(true)}>
+        <TouchableOpacity onPress={() => onCenter(true)}>
           <MaterialIcons
             style={{
               position: "absolute",
@@ -348,7 +363,6 @@ export default function CyclingPage() {
     </View>
   );
 }
-const { width, height } = Dimensions.get("window");
 const isAndroid = Platform.OS === "android";
 const styles = StyleSheet.create({
   AndroidSafeArea: {

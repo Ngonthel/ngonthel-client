@@ -19,7 +19,7 @@ import MapViewDirections from "react-native-maps-directions";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
 import firebase from "firebase/compat/app";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue, remove } from "firebase/database";
 import Bike from "../assets/personal-bike.svg";
 import Start from "../assets/starts-logo.svg";
 import { useNavigation, useRoute } from "@react-navigation/core";
@@ -71,12 +71,6 @@ const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const INITIAL_POSITION = {
-  latitude: 40.76711,
-  longitude: -73.979704,
-  latitudeDelta: LATITUDE_DELTA,
-  longitudeDelta: LONGITUDE_DELTA,
-};
 
 const GOOGLE_API_KEY = "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo";
 
@@ -160,14 +154,6 @@ export default function CyclingPage_Party() {
     setToken(token);
   };
 
-  const moveTo = async (position) => {
-    const camera = await mapRef.current?.getCamera();
-    if (camera) {
-      camera.center = position;
-      mapRef.current?.animateCamera(camera, { duration: 1000 });
-    }
-  };
-
   const edgePaddingValue = 70;
   const edgePadding = {
     top: edgePaddingValue,
@@ -184,23 +170,6 @@ export default function CyclingPage_Party() {
     }
   };
 
-  // const traceRoute = () => {
-  //   if (origin && destination) {
-  //     setShowDirections(true);
-  //     mapRef.current?.fitToCoordinates([origin, destination], { edgePadding });
-  //   }
-  // };
-
-  // const onPlaceSelected = (details, flag) => {
-  //   const set = flag === "origin" ? setOrigin : setDestination;
-  //   const position = {
-  //     latitude: details?.geometry.location.lat || 0,
-  //     longitude: details?.geometry.location.lng || 0,
-  //   };
-  //   set(position);
-  //   moveTo(position);
-  // };
-
   function writeUserData(satu, dua) {
     set(ref(db, eventCode + "/" + username), {
       username: username,
@@ -209,30 +178,30 @@ export default function CyclingPage_Party() {
     });
   }
 
-  async function getDataReaktime() {
-    try {
-    } catch (error) {
-      console.log(error);
-    }
+  function deletUserData() {
+    remove(ref(db, eventCode + "/" + username),);
   }
 
   useEffect(() => {
-    // if (run) {
-    //   // getDataReaktime()
-    // }
-    const starCountRef = ref(db, eventCode + "/");
-
     try {
+      const starCountRef = ref(db, eventCode + "/");
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-        const newData = Object.keys(data).map((key) => ({
-          ...data[key],
-        }));
-        console.log(newData, "------");
-        setdataParty(newData);
+        if (data) {
+          const newData = Object.keys(data).map((key) => ({
+            ...data[key],
+          }));
+          console.log(newData, '------')
+          setdataParty(newData);
+        } else {
+          // Handle case when data is null or undefined
+          console.log('No data available');
+          setdataParty([]);
+        }
       });
     } catch (error) {
-      console.log(error);
+      // Handle any errors that might occur while setting up the listener
+      console.error('Error occurred while listening:', error);
     }
   }, []);
 
@@ -272,6 +241,22 @@ export default function CyclingPage_Party() {
       });
     } else {
       alert("You have to move to save the history");
+    }
+    deletUserData()
+  }
+
+  const onCenter = (value) => {
+    if (value) {
+      setfollow(true)
+    }
+    if (currentLocation) {
+      mapRef.current.animateToRegion({
+        latitude: currentLocation.latitude - 0.004,
+        longitude: currentLocation.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA
+      })
+
     }
   }
 
@@ -330,6 +315,9 @@ export default function CyclingPage_Party() {
     }
 
     if (run) {
+      if (follow) {
+        onCenter()
+      }
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       console.log(distance);
       if (distance > 10) {
@@ -397,15 +385,6 @@ export default function CyclingPage_Party() {
   }, [timer]);
 
   const [dataParty, setdataParty] = useState([]);
-  const [first, setfirst] = useState("dani");
-
-  const [regionLocation, setRegionLocation] = useState();
-  function followHadler(value) {
-    if (value) {
-      setRegionLocation();
-    }
-    setfollow(false);
-  }
 
   const navigation = useNavigation();
 
@@ -419,9 +398,8 @@ export default function CyclingPage_Party() {
           ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          initialRegion={INITIAL_POSITION}
-          region={follow ? initialRegion : regionLocation}
-          onTouchEnd={() => followHadler(false)}
+          initialRegion={initialRegion}
+          onTouchEnd={() => setfollow(false)}
           loadingEnabled
         >
           {origin && (
@@ -497,7 +475,7 @@ export default function CyclingPage_Party() {
       )}
 
       <View className="shadow-2xl" style={styles.ButtonContainer}>
-        <TouchableOpacity onPress={() => setfollow(true)}>
+        <TouchableOpacity onPress={() => onCenter(true)}>
           <MaterialIcons
             style={{
               position: "absolute",
