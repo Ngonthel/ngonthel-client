@@ -29,24 +29,21 @@ export default function CyclingPage() {
   const mapRef = useRef()
   const markerRef = useRef()
 
-  const onCenter = () => {
-    mapRef.current.animateToRegion({
-      latitude: currentLocation.latitude,
-      longitude: currentLocation.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA
-    })
-  }
-  const animate = (latitude, longitude) => {
-    const newCoordinate = { latitude, longitude };
-    if (Platform.OS == 'android') {
-      if (markerRef.current) {
-        markerRef.current.animateMarkerToCoordinate(newCoordinate, 7000);
-      }
-    } else {
-      initialRegion.timing(newCoordinate).start();
+  const onCenter = (value) => {
+    if (value) {
+      setfollow(true)
+    }
+    if (currentLocation) {
+      mapRef.current.animateToRegion({
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA
+      })
+
     }
   }
+
 
   const handleButtonClick = () => {
     if (buttonText === "Start") {
@@ -71,6 +68,8 @@ export default function CyclingPage() {
   const [hours, sethours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+
+  const [coordinate, setCoordinate] = useState()
 
   const [prevLocation, setPrevLocation] = useState([
     {
@@ -108,11 +107,17 @@ export default function CyclingPage() {
       return;
     }
 
+
     let location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.BestForNavigation,
     });
     setCurrentLocation(location.coords);
-
+    setCoordinate(new AnimatedRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+    }));
     setInitialRegion({
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
@@ -121,7 +126,12 @@ export default function CyclingPage() {
     });
     console.log(location, "LOC");
 
+
     if (run) {
+      if (follow) {
+        onCenter()
+      }
+
       const distance = haversine(locFirst, initialRegion, { unit: "meter" });
       if (distance > 10) {
         setAvgSpeed([...avgSpeed, location.coords.speed])
@@ -163,7 +173,7 @@ export default function CyclingPage() {
         setTimer(totalTime);
         getLocation();
       }
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(time);
   });
@@ -178,13 +188,14 @@ export default function CyclingPage() {
     setSeconds(Math.floor(timer % 60));
   }, [timer]);
 
-  const [regionLocation, setRegionLocation] = useState();
-  function followHadler(value) {
-    if (value) {
-      setRegionLocation();
-    }
-    setfollow(false);
-  }
+  // const [regionLocation, setRegionLocation] = useState();
+  // function followHadler(value) {
+  //   if (value) {
+  //     setRegionLocation();
+  //   }
+  //   setfollow(false);
+  // }
+
 
   return (
     <View style={styles.AndroidSafeArea}>
@@ -197,18 +208,22 @@ export default function CyclingPage() {
           ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          initialRegion={initialRegion}
-          region={follow ? initialRegion : regionLocation}
-          onTouchEnd={() => followHadler(false)}
+          initialRegion={
+            {
+              latitude: currentLocation?.latitude,
+              longitude: currentLocation?.longitude,
+              latitudeDelta: LATITUDE_DELTA,
+              longitudeDelta: LONGITUDE_DELTA
+            }
+          }
+          onTouchEnd={() => setfollow(false)}
           loadingEnabled
         >
-          {currentLocation && (
+          {coordinate && (
             <>
               <Marker.Animated
-                coordinate={{
-                  latitude: initialRegion.latitude,
-                  longitude: initialRegion.longitude,
-                }}
+                ref={markerRef}
+                coordinate={initialRegion}
                 anchor={{ x: 0.5, y: 0.5 }}
                 title="Your Location"
               >
@@ -235,7 +250,7 @@ export default function CyclingPage() {
 
       <View className="shadow-2xl" style={styles.ButtonContainer}>
         <TouchableOpacity
-          onPress={() => onCenter()}
+          onPress={() => onCenter(true)}
         >
           <MaterialIcons
             style={{
