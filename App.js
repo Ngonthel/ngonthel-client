@@ -3,17 +3,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainTab from "./navigator/MainTab";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
-import { Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+// import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import useMyStore from "./store/MainStore";
 import { useEffect } from "react";
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+// import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 const client = new ApolloClient({
   uri: "http://18.140.54.54:3000/",
   cache: new InMemoryCache(),
@@ -29,17 +24,17 @@ export default function App() {
   const updateIsLoggedIn = useMyStore((state) => state.setAccessToken);
   // const getToken = useMyStore((state) => state.getAccessToken)
 
-  const cekToken = async() => {
-    const token = await AsyncStorage.getItem('access_token')
+  const cekToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
     if (token) {
-      console.log('masuk if');
+      console.log("masuk if");
       // console.log(token , "<<<<");
       updateIsLoggedIn(true);
     }
-  }
+  };
 
   useEffect(() => {
-    cekToken()
+    cekToken();
   }, []);
   const Stack = createNativeStackNavigator();
   const isLoggedIn = useMyStore((state) => state.isLoggedIn);
@@ -50,13 +45,12 @@ export default function App() {
       <NavigationContainer>
         {isLoggedIn ? (
           <MainTab />
-         ) : ( 
-           <Stack.Navigator screenOptions={{ headerShown: false }}> 
-            <Stack.Screen name="login" component={Login} /> 
-            <Stack.Screen name="register" component={Register} /> 
-          </Stack.Navigator> 
-         )}
-        
+        ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="login" component={Login} />
+            <Stack.Screen name="register" component={Register} />
+          </Stack.Navigator>
+        )}
       </NavigationContainer>
     </ApolloProvider>
   );

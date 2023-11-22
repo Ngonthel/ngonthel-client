@@ -1,30 +1,14 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  StatusBar,
-  Platform,
-  Alert,
-} from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, StatusBar, Platform, Alert, ScrollView, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import {
-  ApolloClient,
-  InMemoryCache,
-  useQuery,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, useQuery, ApolloProvider, gql } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
+const { width, height } = Dimensions.get("window");
+
 function HomePage({ navigation }) {
-
-
-  const [homestats, setHomestats] = useState(null)
+  const [homestats, setHomestats] = useState(null);
   const getDetailUser = async () => {
     const QUERY_GET_HOME = gql`
       query Profile($headers: Headers!, $getHistoriesHeaders2: Headers!) {
@@ -37,50 +21,50 @@ function HomePage({ navigation }) {
         getHistories(headers: $getHistoriesHeaders2) {
           avgSpeed
           distance
+          startDate
+          endDate
         }
       }
-    `
+    `;
 
-      try {
-        const client = new ApolloClient({
-          uri: "http://18.140.54.54:3000/",
-          cache: new InMemoryCache(),
-        });
-        
-        const { data } = await client.query({
-          query: QUERY_GET_HOME,
-          variables: {
-            headers: {
-              access_token: await cekToken(),
-            },
-            getHistoriesHeaders2: {
-              access_token: await cekToken()
-            },
+    try {
+      const client = new ApolloClient({
+        uri: "http://18.140.54.54:3000/",
+        cache: new InMemoryCache(),
+      });
+
+      const { data } = await client.query({
+        query: QUERY_GET_HOME,
+        variables: {
+          headers: {
+            access_token: await cekToken(),
           },
-        });
-        // console.log(lastData , "INI INDEX TERAKHIR");
-        // console.log(data.getHistories.length - 1.distance, "DAARI HOME<><><><><><<><>><><><");
-        console.log(data.getHistories[data.getHistories.length - 1].distance, "DAARI HOME<><><><><><<><>><><><");
+          getHistoriesHeaders2: {
+            access_token: await cekToken(),
+          },
+        },
+      });
+      // console.log(lastData , "INI INDEX TERAKHIR");
+      // console.log(data.getHistories.length - 1.distance, "DAARI HOME<><><><><><<><>><><><");
+      console.log(data.getHistories[data.getHistories.length - 1].distance, "DAARI HOME<><><><><><<><>><><><");
 
-        setHomestats(data)
-      } catch (error) {
-        console.log(error)
-        Alert.alert('Error Render Home , please check your Connection')
-      }
-
-  }
+      setHomestats(data);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error Render Home , please check your Connection");
+    }
+  };
   const cekToken = async () => {
     const token = await AsyncStorage.getItem("access_token");
     return token;
   };
 
-
   useEffect(() => {
-    getDetailUser()
-  }, [] )
+    getDetailUser();
+  }, []);
 
   return (
-    <View style={styles.AndroidSafeArea}>
+    <ScrollView style={styles.AndroidSafeArea}>
       {/* HI, USERNAME */}
       <View className="flex flex-row" style={{ marginTop: 20 }}>
         <View className="flex-1 items-left justify-center">
@@ -103,10 +87,7 @@ function HomePage({ navigation }) {
           </View>
         </View>
         <View style={styles.ProfilePicture}>
-          <Image
-            style={{ width: 48, height: 48 }}
-            source={require("../assets/profile.jpg")}
-          />
+          <Image style={{ width: 48, height: 48 }} source={require("../assets/profile.jpg")} />
         </View>
       </View>
 
@@ -120,16 +101,12 @@ function HomePage({ navigation }) {
           Get <Text style={{ fontWeight: "bold", color: "#293038" }}>Out!</Text>
         </Text>
         <Text style={styles.TitleHeader}>
-          Wheels Every{" "}
-          <Text style={{ fontWeight: "bold", color: "#293038" }}>Zone</Text>
+          Wheels Every <Text style={{ fontWeight: "bold", color: "#293038" }}>Zone</Text>
         </Text>
       </View>
 
       <View style={{ width: "100%", height: "100%" }}>
-        <Image
-          style={styles.Banner}
-          source={require("../assets/ngontel2.png")}
-        />
+        <Image style={styles.Banner} source={require("../assets/ngontel2.png")} />
 
         {/* RECENT HISTORY */}
         <Text style={styles.Title}>Recent History</Text>
@@ -137,28 +114,33 @@ function HomePage({ navigation }) {
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Distance</Text>
-              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.distance} m</Text>
+              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.distance / 1000} Km</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Speed</Text>
-              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.avgSpeed} Km/H</Text>
+              <Text style={styles.DataHistory}>{homestats?.getHistories[homestats.getHistories.length - 1]?.avgSpeed * 3.6} Km/H</Text>
             </View>
           </View>
           <View style={styles.CardShadow}>
             <View>
               <Text style={styles.TitleHistory}>Time</Text>
-              <Text style={styles.DataHistory}>387 wH</Text>
+              <Text style={styles.DataHistory}>
+                {Math.round(
+                  (new Date(homestats?.getHistories[homestats.getHistories.length - 1]?.endDate) -
+                    new Date(homestats?.getHistories[homestats.getHistories.length - 1]?.startDate)) /
+                    1000 /
+                    36
+                ) / 100}{" "}
+                Hrs
+              </Text>
             </View>
           </View>
         </View>
         <View style={{ flexDirection: "row" }}>
           <View style={styles.SeeAll}>
-            <Text
-              style={styles.TextSeeAll}
-              onPress={() => navigation.navigate("History")}
-            >
+            <Text style={styles.TextSeeAll} onPress={() => navigation.navigate("History")}>
               See all
             </Text>
           </View>
@@ -167,39 +149,32 @@ function HomePage({ navigation }) {
         <Text style={styles.Title}>Go Cycling</Text>
         <View style={styles.ShadowGoCycling}>
           <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{ width: 100, height: 100 }}
-              source={require("../assets/map.png")}
-            />
+            <Image style={{ width: 100, height: 100 }} source={require("../assets/map.png")} />
             <View style={{ marginLeft: 10, flex: 1 }}>
-              <Text style={styles.CaptionGoCycling}>
-                Find your location, and unlock a world of cycling adventures
-                with Gowez!
-              </Text>
+              <Text style={styles.CaptionGoCycling}>Find your location, and unlock a world of cycling adventures with Gowez!</Text>
               <View style={styles.ButtonContainer}>
-                <TouchableOpacity
-                  style={styles.TouchableOpacity}
-                  onPress={() => navigation.navigate("Cycling")}
-                >
+                <TouchableOpacity style={styles.TouchableOpacity} onPress={() => navigation.navigate("Cycling")}>
                   <Text style={styles.TextButton}>Go</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
+
+        <View className="mt-3" style={{ ...styles.ShadowGoCycling, marginBottom: (1 / 16) * height }}>
+          <View>
+            <Text className="text-center">Point calculation is based on distance (m) / time (s) x 10</Text>
+          </View>
+        </View>
       </View>
-    </View>
-    // </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   AndroidSafeArea: {
     flex: 1,
-    paddingTop:
-      Platform.OS === "android" || Platform.OS === "ios"
-        ? StatusBar.currentHeight
-        : 0,
+    paddingTop: Platform.OS === "android" || Platform.OS === "ios" ? StatusBar.currentHeight : 0,
     paddingHorizontal: 14,
     backgroundColor: "white",
   },
@@ -216,8 +191,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   Banner: {
-    width: "100%",
-    height: "25%",
+    width: width,
+    height: (1 / 4) * height,
     marginTop: Platform.OS === "ios" ? 15 : 10,
   },
   RowRecentHistory: {
@@ -320,7 +295,7 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === "ios" ? 16 : 12,
     marginTop: 1,
     color: "#696e74",
-  }
+  },
 });
 
 export default HomePage;
