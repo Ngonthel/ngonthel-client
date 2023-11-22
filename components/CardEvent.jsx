@@ -57,11 +57,7 @@ export default function CardEvent({ item }) {
   const navigation = useNavigation();
 
   return (
-    <View
-      className="shadow"
-      style={styles.ShadowGoCycling}
-      width={(10 / 11) * width}
-    >
+    <View style={styles.ShadowGoCycling} width={(10 / 11) * width}>
       <Text style={styles.Date}>{formatDate()}</Text>
       <Text style={styles.Title}>{item?.name}</Text>
       <MapView
@@ -118,21 +114,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 5,
     borderRadius: 10,
-    // backgroundColor: 'red',
-    // borderColor: 'black',
-    // borderWidth: 1,
-    // ...Platform.select({
-    //   ios: {
-    //     shadowColor: "rgba(0, 0, 0, 0.2)",
-    //     shadowOffset: { width: 0, height: 2 }, // Set the height value to 4 for shadow on all sides
-    //     shadowOpacity: 1,
-    //     shadowRadius: 4,
-    //   },
-    //   android: {
-    //     elevation: 4,
-    //   },
-    // }),
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(0, 0, 0, 0.2)",
+        shadowOffset: { width: 0, height: 2 }, // Set the height value to 4 for shadow on all sides
+        shadowOpacity: 1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
     padding: 8,
+    width: "50%",
+    alignSelf: "center",
   },
   Title: {
     fontSize: Platform.OS === "ios" ? 18 : 14,
@@ -165,7 +160,7 @@ const styles = StyleSheet.create({
   TextButton: {
     fontSize: 14,
     color: "white",
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   map: {
     width: "100%",

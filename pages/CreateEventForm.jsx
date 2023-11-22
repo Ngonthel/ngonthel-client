@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   StatusBar,
   Platform,
+  ImageBackground,
 } from "react-native";
 import { Input } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
+import { Button } from "@rneui/themed";
+import Logo from "../assets/logoo.svg";
+
+import { Icon } from "@rneui/themed";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 
@@ -48,10 +52,21 @@ const CreateEventForm = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.AndroidSafeArea}>
+    <ImageBackground
+      resizeMode="cover"
+      source={require("../assets/bg-leaderboard.jpg")}
+      style={styles.AndroidSafeArea}
+    >
       <View style={styles.ShadowGoCycling}>
+        <View style={styles.logoContainer}>
+          <Logo width={250} />
+        </View>
         <View>
-          <Text>Event Title:</Text>
+          <Text
+            style={{ fontSize: 18, fontWeight: "500", paddingHorizontal: 10 }}
+          >
+            Event Title:
+          </Text>
           <Input
             value={title}
             onChangeText={(text) => setTitle(text)}
@@ -63,13 +78,65 @@ const CreateEventForm = () => {
             //     style={{ marginRight: 10 }}
             //   />
             // }
+            placeholder="Enter the Event Title ...."
           />
         </View>
         <View>
-          
-          <Button onPress={showDatepicker} title="Show date picker!" />
-          <Button onPress={showTimepicker} title="Show time picker!" />
-          <Text>selected: {date.toLocaleString()}</Text>
+          {/* <Button>
+            <Text>Pick Date Event !</Text>
+          </Button> */}
+          <Button
+            onPress={showDatepicker}
+            title="Pick Date Event"
+            icon={{
+              name: "calendar",
+              type: "font-awesome",
+              size: 15,
+              color: "white",
+            }}
+            iconContainerStyle={{ marginRight: 10 }}
+            titleStyle={{ fontWeight: "700" }}
+            buttonStyle={{
+              backgroundColor: "#FFC329",
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 30,
+            }}
+            containerStyle={{
+              width: 200,
+              marginHorizontal: 50,
+              marginVertical: 10,
+            }}
+          />
+          <Button
+            onPress={showTimepicker}
+            title="Pick Time Event"
+            icon={{
+              name: "clock-o",
+              type: "font-awesome",
+              size: 20,
+              color: "white",
+            }}
+            iconContainerStyle={{ marginRight: 10 }}
+            titleStyle={{ fontWeight: "700" }}
+            buttonStyle={{
+              backgroundColor: "#FFC329",
+              borderColor: "transparent",
+              borderWidth: 0,
+              borderRadius: 30,
+            }}
+            containerStyle={{
+              width: 200,
+              marginHorizontal: 50,
+              marginVertical: 10,
+            }}
+          />
+
+          {/* <Button   title="Show date picker!" /> */}
+          {/* <Button onPress={showTimepicker} title="Show time picker!" /> */}
+          <Text style={{ alignSelf: "center" }}>
+            selected: {date.toLocaleString()}
+          </Text>
           {show && (
             <DateTimePicker
               testID="dateTimePicker"
@@ -81,14 +148,42 @@ const CreateEventForm = () => {
           )}
         </View>
         <Button
+          onPress={() =>
+            navigation.navigate("Create Location", {
+              date: date,
+              title: title,
+            })
+          }
+          title="Next to Pick Maps"
+          icon={{
+            name: "map-o",
+            type: "font-awesome",
+            size: 20,
+            color: "white",
+          }}
+          iconContainerStyle={{ marginRight: 10 }}
+          titleStyle={{ fontWeight: "700" }}
+          buttonStyle={{
+            backgroundColor: "#FFC329",
+            borderColor: "transparent",
+            borderWidth: 0,
+            borderRadius: 30,
+          }}
+          containerStyle={{
+            width: 200,
+            marginHorizontal: 50,
+            marginVertical: 10,
+          }}
+        />
+        {/* <Button
           title="Next"
           onPress={() => navigation.navigate("Create Location", {
             date: date,
             title: title
           })}
-        />
+        /> */}
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -114,10 +209,13 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
       },
       android: {
-        elevation: 2,
+        elevation: 7,
       },
     }),
     padding: Platform.OS === "ios" ? 8 : 7.5,
+  },
+  logoContainer: {
+    alignItems: "center",
   },
 });
 

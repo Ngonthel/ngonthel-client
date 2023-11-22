@@ -209,6 +209,9 @@ export default function Event() {
       >
         <TabView.Item style={styles.tabViewItem}>
           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             data={data?.getEvents}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <CardEvent item={item} />}
@@ -218,6 +221,9 @@ export default function Event() {
 
         <TabView.Item style={styles.tabViewItem}>
           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             data={data_inactive?.getEvents}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => <CardPastEvent item={item} />}
@@ -227,7 +233,11 @@ export default function Event() {
 
         <TabView.Item style={styles.tabViewItem}>
           {myData?.getEvents?.length === 0 ? (
-            <View>
+            <View
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            >
               <Text style={styles.Title}>You don't have an event yet.</Text>
               <View style={styles.ButtonContainer}>
                 <TouchableOpacity
