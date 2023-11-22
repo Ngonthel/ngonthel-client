@@ -1,6 +1,13 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
+import avatar1 from "../assets/avatar1.png";
+import avatar2 from "../assets/avatar2.png";
+import avatar3 from "../assets/avatar3.png";
+import avatar4 from "../assets/avatar4.png";
+import avatar5 from "../assets/avatar5.png";
+import avatar6 from "../assets/avatar6.png";
+
 export default function Cardleaderboard({ data, index }) {
   let medalColor = "transparent";
   if (index === 0) {
@@ -10,6 +17,10 @@ export default function Cardleaderboard({ data, index }) {
   } else if (index === 2) {
     medalColor = "#964B00";
   }
+
+  const avatars = [avatar1, avatar2, avatar3, avatar4, avatar5, avatar6];
+
+  const randomIndex = Math.floor(Math.random() * avatars.length);
   // console.log(data,"<><><<<<<<<<<<<>>>>>>>>>>>>>>");
   return (
     <>
@@ -24,10 +35,7 @@ export default function Cardleaderboard({ data, index }) {
           {index + 1}
         </Text>
         <View style={styles.avatarContainer}>
-          <Image
-            source={require("../assets/default-person.jpg")}
-            style={styles.avatar}
-          />
+          <Image source={avatars[randomIndex]} style={styles.avatar} />
         </View>
         <View style={{ alignSelf: "center" }}>
           <Text

@@ -54,7 +54,7 @@ function InputAutocomplete({ label, placeholder, onPlaceSelected }) {
   );
 }
 
-export default function MapV3({navigation}) {
+export default function MapV3({ navigation }) {
   const [origin, setOrigin] = useState();
   const [destination, setDestination] = useState();
   const [showDirections, setShowDirections] = useState(false);
@@ -155,11 +155,8 @@ export default function MapV3({navigation}) {
         },
       },
     });
-    navigation.navigate('Event')
+    navigation.navigate("Event");
   };
-
-  
-
 
   return (
     <View style={styles.container}>
@@ -190,12 +187,14 @@ export default function MapV3({navigation}) {
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "origin");
           }}
+          placeholder="Enter your trip origin ..."
         />
         <InputAutocomplete
           label="Destination"
           onPlaceSelected={(details) => {
             onPlaceSelected(details, "destination");
           }}
+          placeholder="Enter your trip destination ..."
         />
 
         <TouchableOpacity style={styles.button} onPress={traceRoute}>
@@ -244,13 +243,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   button: {
-    backgroundColor: "#bbb",
+    backgroundColor: "#FFC329",
     paddingVertical: 12,
     marginTop: 16,
     borderRadius: 4,
   },
   buttonText: {
     textAlign: "center",
+    color: "white",
+    fontSize: 18,
+    fontWeight: "500",
   },
   containerForm: {
     padding: 15,
