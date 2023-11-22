@@ -144,7 +144,7 @@ export default function DetailEvent({ navigation }) {
         <TouchableOpacity style={styles.TouchableOpacity}>
           <Text style={styles.TextButton}>Join Event</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.TouchableOpacityEnd}>
+        <TouchableOpacity style={styles.TouchableOpacityEnd} >
           <Text style={styles.TextEndEvent}>End Event</Text>
         </TouchableOpacity>
       </View>

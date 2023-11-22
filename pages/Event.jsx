@@ -6,6 +6,7 @@ import {
   Platform,
   FlatList,
   Dimensions,
+  RefreshControl,
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -20,6 +21,7 @@ import {
 } from "@apollo/client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import CardPastEvent from "../components/CardPastEvent";
 const GET_EVENTS = gql`
   query GetEvents($headers: Headers!, $filter: String) {
     getEvents(headers: $headers, filter: $filter) {
@@ -42,9 +44,62 @@ const GET_EVENTS = gql`
     }
   }
 `;
+
+const GET_EVENTS_INACTIVE = gql`
+  query GetEvents($headers: Headers!, $filter: String) {
+    getEvents(headers: $headers, filter: $filter) {
+      _id
+      name
+      eventCode
+      eventDate
+      createdBy
+      isActive
+      from {
+        altitude
+        longtitude
+        latitude
+      }
+      dest {
+        altitude
+        longtitude
+        latitude
+      }
+    }
+  }
+`;
+
+const GET_MY_EVENTS = gql`
+  query GetEvents($headers: Headers!, $filter: String) {
+    getEvents(headers: $headers, filter: $filter) {
+      _id
+      name
+      eventCode
+      eventDate
+      createdBy
+      isActive
+      from {
+        altitude
+        longtitude
+        latitude
+      }
+      dest {
+        altitude
+        longtitude
+        latitude
+      }
+    }
+  }
+`;
 export default function Event() {
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    myRefetch();
+    setRefreshing(false);
+  }, [myRefetch]);
   const [token, setToken] = useState("");
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   useEffect(() => {
     cekToken();
   }, []);
@@ -63,7 +118,34 @@ export default function Event() {
     },
   });
 
-  console.log(data);
+  const {
+    data: data_inactive,
+    loading: loading_inactive,
+    error: error_inactive,
+  } = useQuery(GET_EVENTS_INACTIVE, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+      filter: "inactive",
+    },
+  });
+
+  const {
+    data: myData,
+    loading: myLoading,
+    error: myError,
+    refetch: myRefetch,
+  } = useQuery(GET_MY_EVENTS, {
+    variables: {
+      headers: {
+        access_token: token,
+      },
+      filter: "my-event",
+    },
+  });
+
+  console.log(myData);
 
   const [index, setIndex] = useState(0);
   return (
@@ -133,20 +215,55 @@ export default function Event() {
             keyExtractor={(item) => item._id}
           />
         </TabView.Item>
+
         <TabView.Item style={styles.tabViewItem}>
-          <Text h1>Favorite</Text>
+          <FlatList
+            data={data_inactive?.getEvents}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => <CardPastEvent item={item} />}
+            keyExtractor={(item) => item._id}
+          />
         </TabView.Item>
+
         <TabView.Item style={styles.tabViewItem}>
-          {/* <Text h1>Your Event</Text> */}
-          <View
-          >
-            <Text style={styles.Title}>You don't have an event yet.</Text>
-            <View style={styles.ButtonContainer}>
-            <TouchableOpacity style={styles.TouchableOpacity} onPress={() => navigation.navigate('Create Event')}>
-              <Text style={styles.TextButton}>Create Event</Text>
-            </TouchableOpacity>
+          {myData?.getEvents?.length === 0 ? (
+            <View>
+              <Text style={styles.Title}>You don't have an event yet.</Text>
+              <View style={styles.ButtonContainer}>
+                <TouchableOpacity
+                  style={styles.TouchableOpacity}
+                  onPress={() => navigation.navigate("Create Event")}
+                >
+                  <Text style={styles.TextButton}>Create Event</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View>
+              <View style={styles.ButtonContainerTop}>
+                <TouchableOpacity
+                  style={styles.TouchableOpacityTop}
+                  onPress={() => navigation.navigate("Create Event")}
+                >
+                  <Text className="text-xs text-white font-bold">
+                    Create Event
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
+                data={myData?.getEvents}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => <CardEvent item={item} />}
+                keyExtractor={(item) => item._id}
+              />
+            </View>
+          )}
         </TabView.Item>
       </TabView>
     </View>
@@ -223,7 +340,7 @@ const styles = StyleSheet.create({
   TextButton: {
     fontSize: 14,
     color: "white",
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   Title: {
     fontSize: Platform.OS === "ios" ? 18 : 14,
@@ -236,5 +353,17 @@ const styles = StyleSheet.create({
   ButtonContainer: {
     alignItems: "center",
     marginTop: 10,
+  },
+  ButtonContainerTop: {
+    alignItems: "flex-start",
+    marginVertical: 10,
+  },
+  TouchableOpacityTop: {
+    borderRadius: 10,
+    width: "30%",
+    height: 40,
+    backgroundColor: "#FFC329",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

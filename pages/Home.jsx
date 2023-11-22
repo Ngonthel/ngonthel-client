@@ -22,6 +22,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
 function HomePage({ navigation }) {
+
+
   const [homestats, setHomestats] = useState(null)
   const getDetailUser = async () => {
     const QUERY_GET_HOME = gql`
