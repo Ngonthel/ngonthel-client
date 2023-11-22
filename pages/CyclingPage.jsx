@@ -35,7 +35,7 @@ export default function CyclingPage() {
     }
     if (currentLocation) {
       mapRef.current.animateToRegion({
-        latitude: currentLocation.latitude,
+        latitude: currentLocation.latitude - 0.004,
         longitude: currentLocation.longitude,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA
@@ -173,7 +173,7 @@ export default function CyclingPage() {
         setTimer(totalTime);
         getLocation();
       }
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(time);
   });
