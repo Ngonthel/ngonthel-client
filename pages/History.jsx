@@ -180,20 +180,20 @@ export default function History() {
 
             {/* CHART */}
             <View style={styles.ChartShadow}>
-              {data?.getHistories?.length && (
+              {data?.getHistories && (
                 <LineChart
                   data={{
                     labels: ["1", "2", "3", "4", "5", "6", "7"],
                     datasets: [
                       {
                         data: [
-                          data?.getHistories.at(-1).distance / 1000 || 0,
-                          data?.getHistories.at(-2).distance / 1000 || 0,
-                          data?.getHistories.at(-3).distance / 1000 || 0,
-                          data?.getHistories.at(-4).distance / 1000 || 0,
-                          data?.getHistories.at(-5).distance / 1000 || 0,
-                          data?.getHistories.at(-6).distance / 1000 || 0,
-                          data?.getHistories.at(-7).distance / 1000 || 0,
+                          data?.getHistories.at(-1)?.distance / 1000 || 0,
+                          data?.getHistories.at(-2)?.distance / 1000 || 0,
+                          data?.getHistories.at(-3)?.distance / 1000 || 0,
+                          data?.getHistories.at(-4)?.distance / 1000 || 0,
+                          data?.getHistories.at(-5)?.distance / 1000 || 0,
+                          data?.getHistories.at(-6)?.distance / 1000 || 0,
+                          data?.getHistories.at(-7)?.distance / 1000 || 0,
                         ],
                       },
                     ],
