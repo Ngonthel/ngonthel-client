@@ -24,9 +24,11 @@ npx expo start
 scan qrcode in your smartphone
 
 ## Demo
-we prefer demo use android, because we optimization in android
+we prefer use android's demo, because we optimization in android
+must have expo app in smartphone, from playstore or appstore.
+then copy url below and paste to expo app
 
-link expo androoid: exp://u.expo.dev/update/fc93cbbe-9ddc-4bd9-bc1f-c53ddb5a8d47
+link expo android: exp://u.expo.dev/update/fc93cbbe-9ddc-4bd9-bc1f-c53ddb5a8d47
 
 link expo ios: exp://u.expo.dev/update/4720687e-2856-4a27-9b7b-1a289562774c
 
