@@ -10,7 +10,7 @@ import useMyStore from "./store/MainStore";
 import { useEffect } from "react";
 // import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 const client = new ApolloClient({
-  uri: "http://18.140.54.54:3000/",
+  uri: "https://gowez-server.huseinhk.me/",
   cache: new InMemoryCache(),
 });
 

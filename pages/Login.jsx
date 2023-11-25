@@ -41,7 +41,7 @@ export default function Login() {
   const [login, { error }] = useMutation(QUERY_LOGIN, {
     onCompleted: async (data) => {
       try {
-     await AsyncStorage.setItem("access_token", data?.login.access_token)
+        await AsyncStorage.setItem("access_token", data?.login.access_token)
         authStore(true);
         Alert.alert("Success Login")
       } catch (error) {
@@ -56,7 +56,7 @@ export default function Login() {
   });
 
   const handleLogin = () => {
-    login({ variables:{content : { email : emailInput  ,password : passwordInput} } });
+    login({ variables: { content: { email: emailInput, password: passwordInput } } });
   };
 
   const navigation = useNavigation();
@@ -114,15 +114,15 @@ export default function Login() {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
-      <View style={{ alignSelf: "center" , flexDirection : "row" }}>
+      <View style={{ alignSelf: "center", flexDirection: "row" }}>
         <Text style={{ fontSize: 18 }}>dont have account?</Text>
         <TouchableOpacity
-        onPress={() => navigation.navigate("register")}
-      >
-        <Text style={{ color: "black" ,color : 'blue' , marginLeft : 3, fontSize :18 }}>Click Me </Text>
-      </TouchableOpacity>
+          onPress={() => navigation.navigate("register")}
+        >
+          <Text style={{ color: "black", color: 'blue', marginLeft: 3, fontSize: 18 }}>Click Me </Text>
+        </TouchableOpacity>
       </View>
-   
+
     </KeyboardAvoidingView>
   );
 }
