@@ -13,12 +13,20 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logoApp.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBJJ8i1gcnkoBkRx-tqFn9Dam67n2zmJfo"
+        }
       },
       "package": "com.team1.Gowez"
     },

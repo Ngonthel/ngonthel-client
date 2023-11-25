@@ -57,7 +57,7 @@ export default function Leaderboard() {
 
     try {
       const client = new ApolloClient({
-        uri: "http://18.140.54.54:3000/",
+        uri: "https://gowez-server.huseinhk.me/",
         cache: new InMemoryCache(),
       });
 
